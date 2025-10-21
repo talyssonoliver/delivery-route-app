@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Delivery Route Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+```
+<script>
+    const { useState, useEffect } = React;
+
+    const DeliveryRouteGenerator = () => {
+        const [images, setImages] = useState([]);
+        const [processing, setProcessing] = useState(false);
+        const [routes, setRoutes] = useState([]);
+        const [error, setError] = useState('');
+        const [ocrProgress, setOcrProgress] = useState({ current: 0, total: 0, status: '' });
+        const [extractedStops, setExtractedStops] = useState([]);
+        const [tesseractReady, setTesseractReady] = useState(false);
+
+        useEffect(() => {
+            const checkTesseract = setInterval(() => {
+                if (window.Tesseract) {
+                    setTesseractReady(true);
+                    clearInterval(checkTesseract);
+                    console.log('✓ Tesseract.js ready!');
+                }
+            }, 100);
+            return () => clearInterval(checkTesseract);
+        }, []);
+
+        const handleImageUpload = (event) => {
+            const files = Array.from(event.target.files);
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length === 0) {
+                setError('Please select only images (JPG, PNG, etc).');
+                return;
+            }
+            
+            setImages(imageFiles);
+            setError('');
+            setRoutes([]);
+            setExtractedStops([]);
+        };
+
+        const removeImage = (index) => {
+            setImages(prev => prev.filter((_, i) => i !== index));
+        };
+
+        const extractPostcode = (text) => {
+            const postcodeRegex = /\b([A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/gi;
+            const matches = text.match(postcodeRegex);
+            return matches ? matches[0] : null;
+        };
+
+        const cleanAddress = (address) => {
+            let cleaned = address
+                .replace(/^(Mrs?\.?\s+)?[A-Z][a-z]+\s+[A-Z][a-z]+,?\s*/i, '')
+                .replace(/^(Dr\.?\s+)?[A-Z][a-z]+\s+[A-Z][a-z]+,?\s*/i, '')
+                .trim();
+            return cleaned;
+        };
+
+        const parseAddresses = (text) => {
+            const stops = [];
+            const lines = text.split('\n').filter(line => line.trim().length > 0);
+            let currentStop = null;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                const stopMatch = line.match(/^(\d+)\s+(\d{7})/);
+                if (stopMatch) {
+                    if (currentStop) stops.push(currentStop);
+                    currentStop = {
+                        num: parseInt(stopMatch[1]),
+                        address: '',
+                        postcode: '',
+                        weight: '',
+                        deadline: ''
+                    };
+                    continue;
+                }
+                
+                if (currentStop && line.match(/Deadline:\s*(\d{1,2}:\d{2})/i)) {
+                    currentStop.deadline = line.match(/Deadline:\s*(\d{1,2}:\d{2})/i)[1];
+                }
+                
+                if (currentStop && line.match(/Del Weight:\s*([\d.]+)\s*kg/i)) {
+                    currentStop.weight = line.match(/Del Weight:\s*([\d.]+)\s*kg/i)[1] + ' kg';
+                }
+                
+                const postcode = extractPostcode(line);
+                if (currentStop && postcode && !currentStop.postcode) {
+                    currentStop.postcode = postcode;
+                    currentStop.address += (currentStop.address ? ', ' : '') + line;
+                    continue;
+                }
+                
+                if (currentStop && line.length > 3 && !line.match(/^(Delivery|Service Level|Remarks|Signature|Contact|Ref:)/i)) {
+                    if (line.match(/\d+|Road|Street|Avenue|Close|Drive|Lane|Way|Court|House|Building|GB/i)) {
+                        currentStop.address += (currentStop.address ? ', ' : '') + line;
+                    }
+                }
+            }
+            
+            if (currentStop) stops.push(currentStop);
+            return stops.filter(s => s.address && s.postcode);
+        };
+
+        const processImages = async () => {
+            if (images.length === 0) {
+                setError('Please upload images first.');
+                return;
+            }
+
+            if (!tesseractReady) {
+                setError('Please wait for Tesseract.js to load...');
+                return;
+            }
+
+            setProcessing(true);
+            setError('');
+            setOcrProgress({ current: 0, total: images.length, status: 'Starting...' });
+            
+            try {
+                const worker = await Tesseract.createWorker('eng', 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            setOcrProgress(prev => ({
+                                ...prev,
+                                status: `Processing: ${Math.round(m.progress * 100)}%`
+                            }));
+                        }
+                    }
+                });
+
+                const allStops = [];
+                
+                for (let i = 0; i < images.length; i++) {
+                    setOcrProgress(prev => ({ 
+                        ...prev, 
+                        current: i + 1, 
+                        status: `Image ${i + 1}/${images.length}...` 
+                    }));
+                    
+                    const imageUrl = URL.createObjectURL(images[i]);
+                    const { data: { text } } = await worker.recognize(imageUrl);
+                    URL.revokeObjectURL(imageUrl);
+                    
+                    const parsedStops = parseAddresses(text);
+                    allStops.push(...parsedStops);
+                }
+                
+                await worker.terminate();
+                
+                if (allStops.length === 0) {
+                    setError('No addresses detected. Please use clear, readable images.');
+                    setProcessing(false);
+                    return;
+                }
+                
+                const uniqueStops = allStops
+                    .filter((stop, index, self) => 
+                        index === self.findIndex(s => s.num === stop.num)
+                    )
+                    .sort((a, b) => a.num - b.num);
+                
+                setExtractedStops(uniqueStops);
+                
+                const cleanedStops = uniqueStops.map(stop => ({
+                    num: stop.num,
+                    addr: cleanAddress(stop.address) || stop.address,
+                    weight: stop.weight,
+                    deadline: stop.deadline
+                }));
+                
+                const groups = [];
+                for (let i = 0; i < cleanedStops.length; i += 14) {
+                    const group = cleanedStops.slice(i, i + 14);
+                    const destinations = group.map(s => encodeURIComponent(s.addr)).join('&daddr=');
+                    const link = `https://maps.apple.com/?daddr=${destinations}`;
+                    
+                    groups.push({
+                        id: Math.floor(i / 14) + 1,
+                        startStop: group[0].num,
+                        endStop: group[group.length - 1].num,
+                        count: group.length,
+                        stops: group,
+                        link: link
+                    });
+                }
+                
+                setRoutes(groups);
+                setOcrProgress({ 
+                    current: images.length, 
+                    total: images.length, 
+                    status: `✓ ${uniqueStops.length} deliveries extracted!` 
+                });
+                
+            } catch (err) {
+                console.error('OCR Error:', err);
+                setError('Error processing images: ' + err.message);
+            } finally {
+                setProcessing(false);
+            }
+        };
+
+        const copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).catch(err => {
+                console.error('Copy error:', err);
+            });
+        };
+
+        return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4' },
+            React.createElement('div', { className: 'max-w-4xl mx-auto' },
+                React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-6 mb-6' },
+                    React.createElement('h1', { className: 'text-2xl font-bold text-gray-800 mb-2' }, '🗺️ Delivery Route Generator'),
+                    React.createElement('p', { className: 'text-gray-600 text-sm' }, 'Upload run sheet images • OCR • Apple Maps links'),
+                    tesseractReady && React.createElement('p', { className: 'text-green-600 text-xs mt-2' }, '✓ OCR Ready')
+                ),
+                
+                React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-6 mb-4' },
+                    React.createElement('h2', { className: 'text-lg font-semibold mb-4' }, '1. Upload Images'),
+                    React.createElement('input', {
+                        type: 'file',
+                        multiple: true,
+                        accept: 'image/*',
+                        onChange: handleImageUpload,
+                        className: 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
+                    }),
+                    images.length > 0 && React.createElement('div', { className: 'mt-4' },
+                        React.createElement('p', { className: 'text-green-600 text-sm mb-2' }, `✓ ${images.length} image(s)`),
+                        images.map((img, idx) =>
+                            React.createElement('div', { 
+                                key: idx, 
+                                className: 'flex justify-between items-center bg-blue-50 p-2 rounded mb-2' 
+                            },
+                                React.createElement('span', { className: 'text-xs' }, img.name),
+                                React.createElement('button', {
+                                    onClick: () => removeImage(idx),
+                                    className: 'text-red-500 text-xs'
+                                }, 'Remove')
+                            )
+                        )
+                    )
+                ),
+                
+                React.createElement('button', {
+                    onClick: processImages,
+                    disabled: processing || images.length === 0 || !tesseractReady,
+                    className: 'w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg mb-4'
+                }, processing ? ocrProgress.status : '🔍 Process & Generate Routes'),
+                
+                processing && React.createElement('div', { className: 'bg-white rounded-lg p-4 mb-4' },
+                    React.createElement('div', { className: 'w-full bg-gray-200 rounded-full h-2' },
+                        React.createElement('div', {
+                            className: 'bg-blue-600 h-2 rounded-full transition-all',
+                            style: { width: `${(ocrProgress.current / ocrProgress.total) * 100}%` }
+                        })
+                    )
+                ),
+                
+                error && React.createElement('div', { className: 'bg-red-50 border border-red-200 rounded-lg p-4 mb-4' },
+                    React.createElement('p', { className: 'text-red-800 text-sm' }, error)
+                ),
+                
+                routes.length > 0 && React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-6' },
+                    React.createElement('h2', { className: 'text-lg font-semibold mb-4' }, `✓ ${extractedStops.length} Deliveries`),
+                    routes.map(route =>
+                        React.createElement('div', { key: route.id, className: 'border rounded-lg p-4 mb-4' },
+                            React.createElement('div', { className: 'flex justify-between items-center mb-3' },
+                                React.createElement('div', null,
+                                    React.createElement('h3', { className: 'font-bold' }, `Lote ${route.id}`),
+                                    React.createElement('p', { className: 'text-sm text-gray-600' }, 
+                                        `Stops ${route.startStop}-${route.endStop}`
+                                    )
+                                ),
+                                React.createElement('span', { 
+                                    className: 'bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm' 
+                                }, route.count)
+                            ),
+                            React.createElement('a', {
+                                href: route.link,
+                                className: 'block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg text-center mb-2'
+                            }, '🗺️ Open in Apple Maps'),
+                            React.createElement('button', {
+                                onClick: () => copyToClipboard(route.link),
+                                className: 'w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 rounded-lg mb-2'
+                            }, '📋 Copy Link'),
+                            React.createElement('details', { className: 'mt-3' },
+                                React.createElement('summary', { 
+                                    className: 'cursor-pointer text-sm text-gray-700' 
+                                }, 'Show addresses'),
+                                React.createElement('div', { 
+                                    className: 'mt-2 space-y-1 text-xs bg-gray-50 p-2 rounded max-h-48 overflow-y-auto' 
+                                },
+                                    route.stops.map(stop =>
+                                        React.createElement('div', { key: stop.num, className: 'border-b pb-1' },
+                                            React.createElement('strong', null, `${stop.num}. `),
+                                            stop.addr,
+                                            stop.weight && React.createElement('span', { 
+                                                className: 'text-gray-500 ml-2' 
+                                            }, `⚖️ ${stop.weight}`),
+                                            stop.deadline && React.createElement('span', { 
+                                                className: 'text-gray-500 ml-2' 
+                                            }, `⏰ ${stop.deadline}`)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    };
+
+    ReactDOM.render(
+        React.createElement(DeliveryRouteGenerator),
+        document.getElementById('root')
+    );
+</script>
+```
+
+</body>
+</html>
