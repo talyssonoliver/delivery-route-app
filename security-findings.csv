@@ -1,0 +1,11 @@
+ID,Title,Severity,Category,CWE,Location,Status,Estimated Hours,Priority,Impact,Remediation Summary
+VULN-001,Missing Subresource Integrity (SRI),HIGH,Dependency Security,CWE-345,index.html:212-214,OPEN,0.5,1,HIGH,"Add integrity and crossorigin attributes to script tags"
+VULN-002,Missing Content Security Policy,HIGH,Security Headers,CWE-1021,index.html (head),OPEN,2,2,HIGH,"Add CSP meta tag with restrictive policy"
+VULN-003,Missing Security Headers,HIGH,Security Headers,CWE-1021,index.html (head),OPEN,1,3,HIGH,"Add X-Frame-Options X-Content-Type-Options Referrer-Policy"
+VULN-004,No Dependency Management,MEDIUM,Dependency Security,,Repository root,OPEN,4,4,MEDIUM,"Create package.json and implement build process"
+VULN-005,Client-Side File Processing Without Strict Validation,MEDIUM,Input Validation,,index.html:1304-1329,OPEN,1,5,MEDIUM,"Add magic number validation for file type verification"
+VULN-006,XSS Protection Review,LOW,Cross-Site Scripting,CWE-79,index.html:263-266,CLOSED,0,N/A,NONE,"Properly mitigated - no action required"
+QUALITY-001,Monolithic File Structure,MEDIUM,Code Quality,,index.html (1371 lines),OPEN,16,6,MEDIUM,"Refactor into separate HTML CSS and JavaScript files"
+QUALITY-002,High Code Churn,LOW,Development Practice,,Git history,OPEN,0,7,LOW,"Implement better planning and code review processes"
+QUALITY-003,No Progressive Enhancement,LOW,Accessibility,,index.html,OPEN,0.5,8,LOW,"Add <noscript> fallback message"
+QUALITY-004,Large Client-Side Processing,LOW,Performance,,index.html:570-760,OPEN,40,9,LOW,"Consider server-side processing for production"
