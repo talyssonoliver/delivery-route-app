@@ -1,1703 +1,743 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 Ultra Robust Route Generator v3.0 - Maximum Intelligence</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --primary: #4299e1;
-            --primary-dark: #3182ce;
-            --secondary: #667eea;
-            --success: #38b2ac;
-            --warning: #f39c12;
-            --error: #e53e3e;
-            --gray-50: #f7fafc;
-            --gray-100: #edf2f7;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e0;
-            --gray-600: #718096;
-            --gray-800: #2d3748;
-            --gray-900: #1a202c;
-        }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        
-        .container { max-width: 1000px; margin: 0 auto; }
-        
-        .card { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 24px; 
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        h1 { 
-            font-size: 28px;
-            margin-bottom: 8px; 
-            color: var(--gray-900);
-            font-weight: 700;
-        }
-        
-        h2 {
-            font-size: 20px;
-            margin-bottom: 16px;
-            color: var(--gray-800);
-            font-weight: 600;
-        }
-        
-        h3 {
-            font-size: 18px;
-            margin-bottom: 12px;
-            color: var(--gray-800);
-        }
-        
-        .subtitle { 
-            color: var(--gray-600); 
-            font-size: 14px; 
-            margin-bottom: 16px; 
-        }
-        
-        .version-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-left: 8px;
-        }
-        
-        .btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-        
-        .btn:disabled { 
-            background: var(--gray-300);
-            cursor: not-allowed; 
-            opacity: 0.6;
-        }
-        
-        .btn-primary { 
-            background: var(--primary); 
-            color: white; 
-        }
-        
-        .btn-primary:hover:not(:disabled) { 
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary { 
-            background: var(--gray-200); 
-            color: var(--gray-800); 
-            margin-top: 8px; 
-        }
-        
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 13px;
-            width: auto;
-        }
-        
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px dashed var(--gray-300);
-            border-radius: 8px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            background: var(--gray-50);
-        }
-        
-        input[type="password"], input[type="text"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 12px 0;
-            padding: 12px;
-            background: var(--gray-50);
-            border-radius: 8px;
-        }
-        
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        
-        .checkbox-group label {
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .alert {
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .alert-warning { 
-            background: #fef5e7; 
-            border-left: 4px solid var(--warning); 
-            color: #875a0f; 
-        }
-        
-        .alert-error { 
-            background: #fee; 
-            border-left: 4px solid var(--error); 
-            color: #742a2a; 
-        }
-        
-        .alert-success { 
-            background: #e6fffa; 
-            border-left: 4px solid var(--success); 
-            color: #234e52; 
-        }
-        
-        .alert-info {
-            background: #ebf8ff;
-            border-left: 4px solid var(--primary);
-            color: #2c5282;
-        }
-        
-        .progress {
-            width: 100%;
-            height: 10px;
-            background: var(--gray-200);
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 16px 0;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
-            transition: width 0.3s ease;
-        }
-        
-        .processing-stage {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            background: var(--gray-50);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        
-        .processing-stage .icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 14px;
-        }
-        
-        .processing-stage.pending .icon {
-            background: var(--gray-300);
-            color: var(--gray-600);
-        }
-        
-        .processing-stage.processing .icon {
-            background: var(--primary);
-            color: white;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        
-        .processing-stage.complete .icon {
-            background: var(--success);
-            color: white;
-        }
-        
-        .processing-stage.error .icon {
-            background: var(--error);
-            color: white;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .image-list {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 12px;
-        }
-        
-        .image-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            background: var(--gray-50);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        
-        .remove-btn {
-            color: var(--error);
-            cursor: pointer;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        .route-card {
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        
-        .route-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .badge {
-            background: #ebf8ff;
-            color: #2c5282;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        
-        .address-list {
-            max-height: 300px;
-            overflow-y: auto;
-            background: var(--gray-50);
-            padding: 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-top: 12px;
-            display: none;
-        }
-        
-        .address-item {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .address-item .stop-num {
-            color: var(--primary);
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        
-        .show-addresses {
-            cursor: pointer;
-            color: var(--primary);
-            font-size: 14px;
-            margin-top: 12px;
-            user-select: none;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .hidden { display: none !important; }
-        
-        .debug-panel {
-            background: #1a202c;
-            color: #48bb78;
-            padding: 16px;
-            border-radius: 8px;
-            font-family: 'Monaco', monospace;
-            font-size: 11px;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 16px;
-        }
-        
-        .debug-panel pre {
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        
-        .preview-canvas {
-            max-width: 100%;
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            margin-top: 12px;
-        }
-        
-        .enhancement-badge {
-            display: inline-block;
-            background: var(--success);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-            margin-left: 6px;
-        }
-        
-        .feature-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px;
-            background: var(--gray-50);
-            border-radius: 6px;
-            font-size: 13px;
-        }
-        
-        .feature-item .icon {
-            font-size: 18px;
-        }
-        
-        .extracted-addresses {
-            background: #f0fdf4;
-            border: 1px solid #86efac;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 16px;
-        }
-        
-        .extracted-addresses h4 {
-            color: #166534;
-            margin-bottom: 12px;
-        }
-        
-        .address-editor {
-            width: 100%;
-            min-height: 200px;
-            padding: 12px;
-            border: 1px solid var(--gray-300);
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 13px;
-            margin: 12px 0;
-            resize: vertical;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin: 16px 0;
-        }
-        
-        .stat-card {
-            background: var(--gray-50);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: var(--gray-600);
-            margin-top: 4px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>🧠 Ultra Robust Route Generator v3.1 (OCR)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary:#4299e1;--primary-dark:#3182ce;--secondary:#667eea;--success:#38b2ac;--warning:#f39c12;--error:#e53e3e;
+      --gray-50:#f7fafc;--gray-100:#edf2f7;--gray-200:#e2e8f0;--gray-300:#cbd5e0;--gray-600:#718096;--gray-800:#2d3748;--gray-900:#1a202c}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;line-height:1.6}
+    .container{max-width:1000px;margin:0 auto}
+    .card{background:#fff;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+    h1{font-size:28px;margin-bottom:8px;color:var(--gray-900);font-weight:700}
+    h2{font-size:20px;margin-bottom:16px;color:var(--gray-800);font-weight:600}
+    h3{font-size:18px;margin-bottom:12px;color:var(--gray-800)}
+    .subtitle{color:var(--gray-600);font-size:14px;margin-bottom:16px}
+    .version-badge{display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-left:8px}
+    .btn{padding:14px 20px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%}
+    .btn:disabled{background:var(--gray-300);cursor:not-allowed;opacity:.6}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px)}
+    .btn-secondary{background:var(--gray-200);color:var(--gray-800);margin-top:8px}
+    .btn-small{padding:8px 16px;font-size:13px;width:auto}
+    input[type="file"]{width:100%;padding:12px;border:2px dashed var(--gray-300);border-radius:8px;margin-bottom:12px;cursor:pointer;background:var(--gray-50)}
+    input[type="password"],input[type="text"]{width:100%;padding:12px 16px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;margin-bottom:12px}
+    .checkbox-group{display:flex;align-items:center;gap:8px;margin:12px 0;padding:12px;background:var(--gray-50);border-radius:8px}
+    .checkbox-group input[type="checkbox"]{width:18px;height:18px;cursor:pointer}
+    .checkbox-group label{font-size:14px;cursor:pointer;user-select:none}
+    .alert{padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:14px;display:flex;align-items:center;gap:8px}
+    .alert-warning{background:#fef5e7;border-left:4px solid var(--warning);color:#875a0f}
+    .alert-error{background:#fee;border-left:4px solid var(--error);color:#742a2a}
+    .alert-success{background:#e6fffa;border-left:4px solid var(--success);color:#234e52}
+    .alert-info{background:#ebf8ff;border-left:4px solid var(--primary);color:#2c5282}
+    .progress{width:100%;height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden;margin:16px 0}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--primary) 0%,var(--secondary) 100%);transition:width .3s ease}
+    .processing-stage{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:6px;margin-bottom:8px;font-size:13px}
+    .processing-stage .icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:14px}
+    .processing-stage.pending .icon{background:var(--gray-300);color:var(--gray-600)}
+    .processing-stage.processing .icon{background:var(--primary);color:#fff;animation:pulse 1.5s ease-in-out infinite}
+    .processing-stage.complete .icon{background:var(--success);color:#fff}
+    .processing-stage.error .icon{background:var(--error);color:#fff}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .image-list{max-height:300px;overflow-y:auto;margin-top:12px}
+    .image-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--gray-50);border-radius:6px;margin-bottom:8px;font-size:13px}
+    .remove-btn{color:var(--error);cursor:pointer;font-weight:600;padding:4px 8px;border-radius:4px}
+    .route-card{border:1px solid var(--gray-200);border-radius:12px;padding:20px;margin-bottom:16px}
+    .route-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .badge{background:#ebf8ff;color:#2c5282;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700}
+    .address-list{max-height:300px;overflow-y:auto;background:var(--gray-50);padding:16px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
+    .address-item{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gray-200)}
+    .address-item .stop-num{color:var(--primary);font-weight:700;margin-right:8px}
+    .show-addresses{cursor:pointer;color:var(--primary);font-size:14px;margin-top:12px;user-select:none}
+    .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-content{background:#fff;border-radius:16px;padding:28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
+    .hidden{display:none!important}
+    .debug-panel{background:#1a202c;color:#48bb78;padding:16px;border-radius:8px;font-family:Monaco,monospace;font-size:11px;max-height:300px;overflow-y:auto;margin-top:16px}
+    .debug-panel pre{white-space:pre-wrap;word-break:break-all}
+    .preview-canvas{max-width:100%;border:1px solid var(--gray-300);border-radius:8px;margin-top:12px}
+    .enhancement-badge{display:inline-block;background:var(--success);color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-left:6px}
+    .feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
+    .feature-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--gray-50);border-radius:6px;font-size:13px}
+    .feature-item .icon{font-size:18px}
+    .extracted-addresses{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin-top:16px}
+    .extracted-addresses h4{color:#166534;margin-bottom:12px}
+    .address-editor{width:100%;min-height:200px;padding:12px;border:1px solid var(--gray-300);border-radius:6px;font-family:monospace;font-size:13px;margin:12px 0;resize:vertical}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+    .stat-card{background:var(--gray-50);padding:12px;border-radius:8px;text-align:center}
+    .stat-value{font-size:24px;font-weight:700;color:var(--primary)}
+    .stat-label{font-size:12px;color:var(--gray-600);margin-top:4px}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h1>
-                🧠 Ultra Robust Route Generator
-                <span class="version-badge">v3.0 MAX</span>
-            </h1>
-            <div class="subtitle">7-Layer AI Defense System with Image Pre-Processing - 99.9% Accuracy</div>
-            
-            <div class="feature-list">
-                <div class="feature-item">
-                    <span class="icon">🖼️</span>
-                    <span>Advanced Image Pre-Processing</span>
-                </div>
-                <div class="feature-item">
-                    <span class="icon">🤖</span>
-                    <span>Claude Vision AI</span>
-                </div>
-                <div class="feature-item">
-                    <span class="icon">🎯</span>
-                    <span>7-Layer Parsing System</span>
-                </div>
-                <div class="feature-item">
-                    <span class="icon">✅</span>
-                    <span>UK Postcode Validation</span>
-                </div>
-            </div>
-            
-            <div id="apiKeyStatus"></div>
-        </div>
-
-        <div class="card">
-            <h2>📸 Upload Run Sheet Images</h2>
-            <input type="file" id="imageInput" multiple accept="image/*">
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="enablePreprocessing" checked>
-                <label for="enablePreprocessing">
-                    <strong>Enable Advanced Image Pre-Processing</strong>
-                    <span class="enhancement-badge">ENHANCED</span>
-                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">
-                        Contrast enhancement, noise reduction, sharpening, OCR optimization
-                    </div>
-                </label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="enableManualEdit" checked>
-                <label for="enableManualEdit">
-                    <strong>Allow Manual Address Editing</strong>
-                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">
-                        Edit addresses before generating routes
-                    </div>
-                </label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="enableDebug">
-                <label for="enableDebug">
-                    <strong>Show Debug Information</strong>
-                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">
-                        Display all processing stages and AI responses
-                    </div>
-                </label>
-            </div>
-            
-            <div id="imageList" class="image-list"></div>
-            <canvas id="previewCanvas" class="preview-canvas hidden"></canvas>
-        </div>
-
-        <button id="processBtn" class="btn btn-primary" disabled>
-            🧠 Process with Ultra Robust AI (7 Layers)
-        </button>
-
-        <div id="progressSection" class="hidden">
-            <div class="card">
-                <h2>Processing Pipeline</h2>
-                <div id="processingStages"></div>
-                <div id="progressText" style="text-align: center; margin: 16px 0; font-size: 14px; font-weight: 500;"></div>
-                <div class="progress">
-                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
-                </div>
-                <div id="debugPanel" class="debug-panel hidden"></div>
-            </div>
-        </div>
-
-        <div id="extractedSection" class="hidden">
-            <div class="card">
-                <h2>📍 Extracted Addresses</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalExtracted">0</div>
-                        <div class="stat-label">Total Extracted</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="validAddresses">0</div>
-                        <div class="stat-label">Valid Addresses</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="invalidAddresses">0</div>
-                        <div class="stat-label">Invalid/Skipped</div>
-                    </div>
-                </div>
-                <div class="extracted-addresses">
-                    <h4>Edit addresses below if needed (one per line):</h4>
-                    <textarea id="addressEditor" class="address-editor"></textarea>
-                    <div class="btn-group" style="display: flex; gap: 10px;">
-                        <button class="btn btn-primary" onclick="generateRoutes()">
-                            ✅ Generate Routes
-                        </button>
-                        <button class="btn btn-secondary" onclick="reprocessImages()">
-                            🔄 Reprocess Images
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="errorSection" class="hidden">
-            <div class="alert alert-error">
-                <span>⚠️</span>
-                <div id="errorText"></div>
-            </div>
-        </div>
-
-        <div id="resultsSection" class="hidden">
-            <div class="card">
-                <h2 id="resultsTitle"></h2>
-                <div id="routesList"></div>
-            </div>
-        </div>
-
-        <div id="instructionsSection" class="card">
-            <h3>✨ 7-Layer Ultra Defense System:</h3>
-            
-            <div style="margin-top: 16px; padding: 16px; background: #e6fffa; border-radius: 10px; font-size: 13px;">
-                <strong style="font-size: 14px;">🛡️ Processing Layers:</strong>
-                <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">
-                    <li><strong>Layer 0:</strong> Advanced Image Pre-Processing (contrast, sharpen, denoise)</li>
-                    <li><strong>Layer 1:</strong> Claude Vision AI with ultra-specific UK runsheet prompt</li>
-                    <li><strong>Layer 2:</strong> Aggressive metadata removal (Del Weight, Deadline, etc.)</li>
-                    <li><strong>Layer 3:</strong> UK Postcode validation & extraction</li>
-                    <li><strong>Layer 4:</strong> Name detection & removal algorithms</li>
-                    <li><strong>Layer 5:</strong> Address reconstruction & normalization</li>
-                    <li><strong>Layer 6:</strong> Manual editing & verification</li>
-                </ul>
-            </div>
-            
-            <div style="margin-top: 16px; padding: 14px; background: #fef5e7; border-radius: 8px; font-size: 13px;">
-                <strong>🔧 Advanced Features:</strong>
-                <ul style="margin-top: 8px; padding-left: 20px; line-height: 1.6;">
-                    <li>Handles partial addresses and reconstructs them</li>
-                    <li>Removes all metadata (|, Deadline:, Service Level:, etc.)</li>
-                    <li>Validates UK postcodes with strict regex</li>
-                    <li>Groups into Apple Maps routes (max 14 stops)</li>
-                    <li>Manual address editor for corrections</li>
-                </ul>
-            </div>
-            
-            <div style="margin-top: 16px; padding: 14px; background: #ebf8ff; border-radius: 8px; font-size: 13px;">
-                <strong>🔑 API Key Required:</strong> Get your free Claude API key at 
-                <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> 
-                (includes $5 credit - enough for ~1000 images)
-            </div>
-        </div>
+  <div class="container">
+    <div class="card">
+      <h1>🧠 Ultra Robust Route Generator <span class="version-badge">v3.1 OCR</span></h1>
+      <div class="subtitle">Client-side OCR (Tesseract.js) + multi-layer UK address normalisation</div>
+      <div class="feature-list">
+        <div class="feature-item"><span class="icon">🖼️</span><span>Advanced Image Pre-Processing</span></div>
+        <div class="feature-item"><span class="icon">🔎</span><span>OCR (Tesseract.js)</span></div>
+        <div class="feature-item"><span class="icon">🎯</span><span>7-Layer Parsing System</span></div>
+        <div class="feature-item"><span class="icon">✅</span><span>UK Postcode Validation</span></div>
+      </div>
     </div>
 
-    <div id="apiKeyModal" class="modal">
-        <div class="modal-content">
-            <h3 style="font-size: 20px; margin-bottom: 12px;">🔑 Anthropic Claude API Key</h3>
-            <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px;">
-                Your API key is stored locally and never sent to any server except Anthropic's API.
-            </p>
-            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
-            <button class="btn btn-primary" onclick="saveApiKey()">Save Key</button>
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-        </div>
+    <div class="card">
+      <h2>📸 Upload Run Sheet Images</h2>
+      <input type="file" id="imageInput" multiple accept="image/*" />
+      <div class="checkbox-group">
+        <input type="checkbox" id="enablePreprocessing" checked />
+        <label for="enablePreprocessing">
+          <strong>Enable Advanced Image Pre-Processing</strong>
+          <span class="enhancement-badge">ENHANCED</span>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Contrast enhancement, noise reduction, sharpening, OCR optimisation</div>
+        </label>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="enableManualEdit" checked />
+        <label for="enableManualEdit">
+          <strong>Allow Manual Address Editing</strong>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Edit addresses before generating routes</div>
+        </label>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="enableDebug" />
+        <label for="enableDebug">
+          <strong>Show Debug Information</strong>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Display all processing stages and OCR logs</div>
+        </label>
+      </div>
+
+      <div id="imageList" class="image-list"></div>
+      <canvas id="previewCanvas" class="preview-canvas hidden"></canvas>
     </div>
 
-    <script>
-        'use strict';
-        
-        // ==================== STATE MANAGEMENT ====================
-        let images = [];
-        let apiKey = localStorage.getItem('anthropic_api_key') || '';
-        let isProcessing = false;
-        let debugMode = false;
-        let enablePreprocessing = true;
-        let enableManualEdit = true;
-        let extractedAddresses = [];
+    <button id="processBtn" class="btn btn-primary" disabled>🧠 Process with Ultra Robust AI (7 Layers)</button>
 
-        // ==================== UK POSTCODE VALIDATION ====================
-        const UK_POSTCODE_PATTERNS = [
-            /\b([A-Z]{1,2}\d{1,2}[A-Z]?)\s*(\d[A-Z]{2})\b/gi,
-            /\b([A-Z]{1,2}\d{1,2}[A-Z]?)-(\d[A-Z]{2})\b/gi,
-            /\b([A-Z]{1,2}\d{1,2}[A-Z]?)(\d[A-Z]{2})\b/gi,
-        ];
-        
-        const STRICT_UK_POSTCODE = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2}$/i;
-        
-        function isValidUKPostcode(postcode) {
-            if (!postcode) return false;
-            const normalized = postcode.trim().toUpperCase().replace(/\s+/g, ' ');
-            return STRICT_UK_POSTCODE.test(normalized);
-        }
-        
-        function extractPostcodes(text) {
-            const postcodes = new Set();
-            UK_POSTCODE_PATTERNS.forEach(pattern => {
-                const matches = text.matchAll(pattern);
-                for (const match of matches) {
-                    const postcode = `${match[1]} ${match[2]}`.toUpperCase();
-                    if (isValidUKPostcode(postcode)) {
-                        postcodes.add(postcode);
-                    }
-                }
-            });
-            return Array.from(postcodes);
-        }
+    <div id="progressSection" class="hidden">
+      <div class="card">
+        <h2>Processing Pipeline</h2>
+        <div id="processingStages"></div>
+        <div id="progressText" style="text-align:center;margin:16px 0;font-size:14px;font-weight:500"></div>
+        <div class="progress"><div id="progressBar" class="progress-bar" style="width:0%"></div></div>
+        <div id="debugPanel" class="debug-panel hidden"></div>
+      </div>
+    </div>
 
-        // ==================== AGGRESSIVE CLEANING & FILTERING ====================
-        const IGNORE_KEYWORDS = [
-            'Del Weight:', 'Del Items:', 'Deadline:', 'Service Level:',
-            'Signature:', 'Remarks:', 'Contact Nos:', 'Ref:', 'Name & Time:',
-            'Security:', 'Delivery', 'Collection', 'Consignment',
-            'Service Type:', 'Tracking:', 'Barcode:', 'Driver:', 'Route:',
-            'Time Window:', 'Priority:', 'Notes:', 'Instructions:',
-            'Status:', 'Confirmed:', 'POD:', 'Photo:', 'GPS:',
-            'Del Date:', 'Manifest:', 'Run:', 'Stop:',
-            'Col Weight:', 'Col Items:', 'ce Level:', 'a cadline:',
-            'service Level:', 've END16', 'of Deadline:', 'BE dline:'
-        ];
-        
-        const NAME_PATTERNS = [
-            /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sir|Lady|Lord)\\.?\s+[A-Z][a-z]+\s+[A-Z][a-z]+/gi,
-            /\b(Mr|Mrs|Ms|Miss|Dr|Prof)\s+[A-Z][a-z]+\s+[A-Z][a-z]+/gi,
-            /^[A-Z][a-z]+\s+[A-Z][a-z]+,\s*/,
-            /^[A-Z\s]+,\s*/,
-            /^[A-Z][A-Z\s]+[A-Z],\s*/,
-        ];
-        
-        function removeName(address) {
-            let cleaned = address;
-            NAME_PATTERNS.forEach(pattern => {
-                cleaned = cleaned.replace(pattern, '');
-            });
-            return cleaned.trim();
-        }
-        
-        function deepCleanAddress(rawText) {
-            if (!rawText) return '';
-            
-            let cleaned = rawText;
-            
-            // Remove pipe separators
-            cleaned = cleaned.replace(/\|/g, ' ');
-            
-            // Remove all ignore keywords and their associated values
-            IGNORE_KEYWORDS.forEach(kw => {
-                const escapedKw = kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-                const regex = new RegExp(escapedKw + '\\s*[^\\n]*', 'gi');
-                cleaned = cleaned.replace(regex, ' ');
-            });
-            
-            // Remove stop numbers at the beginning
-            cleaned = cleaned.replace(/^\d{1,3}\s*\.?\s*/g, '');
-            
-            // Remove delivery/collection indicators
-            cleaned = cleaned.replace(/\b(Delivery|Collection)\b/gi, '');
-            
-            // Remove dates and times
-            cleaned = cleaned.replace(/\d{1,2}:\d{2}/g, '');
-            cleaned = cleaned.replace(/\d{1,2}\/\d{1,2}\/\d{2,4}/g, '');
-            
-            // Remove reference codes
-            cleaned = cleaned.replace(/\b[A-Z]{2,}\d{4,}/g, '');
-            cleaned = cleaned.replace(/\bRef:\s*[^\s]+/gi, '');
-            
-            // Remove phone numbers
-            cleaned = cleaned.replace(/\+?[\d\s\-\(\)]{10,}/g, '');
-            cleaned = cleaned.replace(/\b0\d{10}\b/g, '');
-            
-            // Remove names
-            cleaned = removeName(cleaned);
-            
-            // Clean up whitespace and commas
-            cleaned = cleaned.replace(/\s+/g, ' ');
-            cleaned = cleaned.replace(/,\s*,+/g, ',');
-            cleaned = cleaned.replace(/^\s*,+|,+\s*$/g, '');
-            cleaned = cleaned.trim();
-            
-            return cleaned;
-        }
-        
-        function reconstructAddress(fragments) {
-            // Try to reconstruct a complete address from fragments
-            const parts = [];
-            let hasPostcode = false;
-            let postcode = '';
-            
-            // Find postcode first
-            const postcodes = extractPostcodes(fragments);
-            if (postcodes.length > 0) {
-                postcode = postcodes[0];
-                hasPostcode = true;
-            }
-            
-            if (!hasPostcode) return null;
-            
-            // Clean the fragments
-            let cleaned = deepCleanAddress(fragments);
-            
-            // Remove the postcode from the middle if it appears
-            cleaned = cleaned.replace(postcode, '');
-            
-            // Try to identify address components
-            const lines = cleaned.split(/[,\n]/).map(l => l.trim()).filter(l => l.length > 0);
-            
-            // Filter out non-address lines
-            const addressLines = lines.filter(line => {
-                // Keep lines that look like addresses
-                if (line.match(/\b(Road|Street|Lane|Avenue|Drive|Close|Way|Place|Court|Gardens?|Square|Crescent|Grove|Park|Hill|View)\b/i)) {
-                    return true;
-                }
-                if (line.match(/\b(Flat|Apartment|Unit|Suite|House|Building)\s+\w+/i)) {
-                    return true;
-                }
-                if (line.match(/^\d+\s+[A-Z]/)) { // Street numbers
-                    return true;
-                }
-                if (line.match(/\b(London|Middlesex|Surrey|Kent|Essex|Hertfordshire|Berkshire)\b/i)) {
-                    return true;
-                }
-                // Common UK place names
-                if (line.match(/\b(Ruislip|Pinner|Harrow|Northwood|Eastcote|Ickenham|Uxbridge|Hayes|Stanmore)\b/i)) {
-                    return true;
-                }
-                return false;
-            });
-            
-            if (addressLines.length === 0) return null;
-            
-            // Reconstruct address
-            const finalAddress = addressLines.join(', ') + ', ' + postcode + ' GB';
-            
-            return finalAddress;
-        }
+    <div id="extractedSection" class="hidden">
+      <div class="card">
+        <h2>📍 Extracted Addresses</h2>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value" id="totalExtracted">0</div><div class="stat-label">Total Extracted</div></div>
+          <div class="stat-card"><div class="stat-value" id="validAddresses">0</div><div class="stat-label">Valid Addresses</div></div>
+          <div class="stat-card"><div class="stat-value" id="invalidAddresses">0</div><div class="stat-label">Invalid/Skipped</div></div>
+        </div>
+        <div class="extracted-addresses">
+          <h4>Edit addresses below if needed (one per line):</h4>
+          <textarea id="addressEditor" class="address-editor"></textarea>
+          <div class="btn-group" style="display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="generateRoutes()">✅ Generate Routes</button>
+            <button class="btn btn-secondary" onclick="reprocessImages()">🔄 Reprocess Images</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // ==================== ENHANCED IMAGE PRE-PROCESSING ====================
-        async function preprocessImage(file) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                const reader = new FileReader();
-                
-                reader.onload = (e) => {
-                    img.onload = () => {
-                        try {
-                            const canvas = document.getElementById('previewCanvas');
-                            const ctx = canvas.getContext('2d');
-                            
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            
-                            // Draw original image
-                            ctx.drawImage(img, 0, 0);
-                            
-                            // Get image data
-                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                            const data = imageData.data;
-                            
-                            debugLog('📸 Advanced pre-processing: ' + file.name);
-                            
-                            // 1. Convert to grayscale with better weights
-                            for (let i = 0; i < data.length; i += 4) {
-                                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                                data[i] = data[i + 1] = data[i + 2] = gray;
-                            }
-                            
-                            // 2. Increase contrast significantly
-                            const contrastFactor = 1.5;
-                            for (let i = 0; i < data.length; i += 4) {
-                                data[i] = Math.min(255, Math.max(0, (data[i] - 128) * contrastFactor + 128));
-                                data[i + 1] = data[i];
-                                data[i + 2] = data[i];
-                            }
-                            
-                            // 3. Apply sharpening
-                            const width = canvas.width;
-                            const height = canvas.height;
-                            const sharpenKernel = [
-                                0, -1, 0,
-                                -1, 5, -1,
-                                0, -1, 0
-                            ];
-                            
-                            const output = new Uint8ClampedArray(data);
-                            for (let y = 1; y < height - 1; y++) {
-                                for (let x = 1; x < width - 1; x++) {
-                                    let sum = 0;
-                                    for (let ky = -1; ky <= 1; ky++) {
-                                        for (let kx = -1; kx <= 1; kx++) {
-                                            const idx = ((y + ky) * width + (x + kx)) * 4;
-                                            const kidx = (ky + 1) * 3 + (kx + 1);
-                                            sum += data[idx] * sharpenKernel[kidx];
-                                        }
-                                    }
-                                    const idx = (y * width + x) * 4;
-                                    output[idx] = output[idx + 1] = output[idx + 2] = Math.min(255, Math.max(0, sum));
-                                }
-                            }
-                            
-                            // 4. Apply threshold to make text more clear
-                            const threshold = 180;
-                            for (let i = 0; i < output.length; i += 4) {
-                                const value = output[i] > threshold ? 255 : output[i] < 60 ? 0 : output[i];
-                                output[i] = output[i + 1] = output[i + 2] = value;
-                            }
-                            
-                            // Put processed data back
-                            const processedData = new ImageData(output, width, height);
-                            ctx.putImageData(processedData, 0, 0);
-                            
-                            debugLog('✅ Pre-processing complete');
-                            
-                            if (document.getElementById('enablePreprocessing').checked) {
-                                canvas.classList.remove('hidden');
-                            }
-                            
-                            // Convert canvas to base64
-                            canvas.toBlob((blob) => {
-                                const processedReader = new FileReader();
-                                processedReader.onload = () => {
-                                    resolve(processedReader.result.split(',')[1]);
-                                };
-                                processedReader.onerror = reject;
-                                processedReader.readAsDataURL(blob);
-                            }, 'image/jpeg', 0.95);
-                            
-                        } catch (err) {
-                            debugLog('❌ Pre-processing error: ' + err.message);
-                            reject(err);
-                        }
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
+    <div id="errorSection" class="hidden">
+      <div class="alert alert-error"><span>⚠️</span><div id="errorText"></div></div>
+    </div>
+
+    <div id="resultsSection" class="hidden">
+      <div class="card">
+        <h2 id="resultsTitle"></h2>
+        <div id="routesList"></div>
+      </div>
+    </div>
+
+    <div id="instructionsSection" class="card">
+      <h3>✨ 7-Layer Ultra Defense System:</h3>
+      <div style="margin-top:16px;padding:16px;background:#e6fffa;border-radius:10px;font-size:13px">
+        <strong style="font-size:14px">🛡️ Processing Layers:</strong>
+        <ul style="margin-top:10px;padding-left:20px;line-height:1.8">
+          <li><strong>Layer 0:</strong> Advanced Image Pre-Processing (contrast, sharpen, denoise)</li>
+          <li><strong>Layer 1:</strong> OCR (Tesseract.js) from preprocessed canvas</li>
+          <li><strong>Layer 2:</strong> Row parsing with postcode detection</li>
+          <li><strong>Layer 3:</strong> Aggressive metadata removal</li>
+          <li><strong>Layer 4:</strong> UK Postcode validation & spacing fix</li>
+          <li><strong>Layer 5:</strong> Address reconstruction & normalisation</li>
+          <li><strong>Layer 6:</strong> Manual editing & verification</li>
+        </ul>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:#fef5e7;border-radius:8px;font-size:13px">
+        <strong>🔧 Notes:</strong>
+        <ul style="margin-top:8px;padding-left:20px;line-height:1.6">
+          <li>Removes personal names; keeps business/building names.</li>
+          <li>Groups into Apple Maps routes (max 14 stops).</li>
+          <li>All client-side; no API keys.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
+
+  <script>
+    'use strict';
+
+    // ==================== STATE ====================
+    let images = [];
+    let isProcessing = false;
+    let debugMode = false;
+    let enablePreprocessing = true;
+    let enableManualEdit = true;
+    let extractedAddresses = [];
+    let tesseractWorker = null;
+
+    // ==================== DEBUG ====================
+    function debugLog(message, data = null) {
+      if (!debugMode) return;
+      const panel = document.getElementById('debugPanel');
+      if (!panel) return;
+      panel.classList.remove('hidden');
+      const timestamp = new Date().toLocaleTimeString();
+      if (data) {
+        panel.innerHTML += `<div>[${timestamp}] ${message}</div><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+      } else {
+        panel.innerHTML += `<div>[${timestamp}] ${escapeHtml(message)}</div>`;
+      }
+      panel.scrollTop = panel.scrollHeight;
+    }
+    function escapeHtml(s){return s.replace(/[&<>"']/g,(m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+
+    function updateProcessingStage(stage, status) {
+      const stageEl = document.getElementById(`stage-${stage}`);
+      if (!stageEl) return;
+      stageEl.className = `processing-stage ${status}`;
+      const icon = stageEl.querySelector('.icon');
+      switch (status) {
+        case 'processing': icon.textContent = '⏳'; break;
+        case 'complete':   icon.textContent = '✓';  break;
+        case 'error':      icon.textContent = '✗';  break;
+        default:           icon.textContent = '○';
+      }
+    }
+
+    // ==================== UK POSTCODES + RULES ====================
+    const UK_POSTCODE_STRICT = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/i;
+    const UK_POSTCODE_FINDALL = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/gi;
+
+    const THOROUGHFARES = /\b(Road|Rd|Street|St|Lane|Ln|Avenue|Ave|Drive|Dr|Close|Way|Place|Court|Gardens?|Square|Crescent|Cres|Grove|Park|Hill|View|Mews|Parade|Terrace|Walk|Row)\b/i;
+    const UNIT_HINTS = /\b(Flat|Apt|Apartment|Unit|Suite|Room|Rm|House|Bldg|Building|Block)\b/i;
+    const AREAS = /\b(London|Middlesex|Surrey|Kent|Essex|Herts|Hertfordshire|Bucks|Buckinghamshire|Berkshire|Oxfordshire|Bedfordshire|Hillingdon|Harrow|Ealing|Hounslow|Brent|Barnet|Camden|Westminster|Kensington|Chelsea|Islington|Southwark|Lambeth|Wandsworth|Ruislip|Pinner|Northwood|Eastcote|Ickenham|Uxbridge|Hayes|Stanmore)\b/i;
+
+    const IGNORE_TOKENS = [
+      'Del Weight','Del Items','Deadline','Service Level','Signature','Remarks',
+      'Contact Nos','Ref','Name & Time','Security','Tracking','Barcode','Driver',
+      'Route','Time Window','Priority','POD','GPS','Manifest','Run','Stop',
+      'Delivery','Collection','Col Weight','Col Items'
+    ];
+
+    function fixOcrArtifacts(s) {
+      return s
+        .replace(/[\u2010-\u2015]/g, '-')     // dashes
+        .replace(/[|¦]/g, ' ')                // pipes
+        .replace(/\bHAO\b/gi, 'HA0')          // O->0
+        .replace(/\bHAG\b/gi, 'HA6')          // G->6
+        .replace(/\b([A-Z]{1,2}\d{1,2}[A-Z]?)\s*([0O]\w\w)\b/gi, (_, a, b)=>`${a} ${b.replace(/^O/,'0')}`)
+        .replace(/\b([A-Z]{1,2})\s+(\d)/g, '$1$2') // collapse outward space
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
+
+    function stripMetadata(line) {
+      let s = line;
+      for (const kw of IGNORE_TOKENS) {
+        const rx = new RegExp(kw.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&') + '\\s*[^,|\\n]*','gi');
+        s = s.replace(rx,' ');
+      }
+      s = s.replace(/\b\d{1,2}:\d{2}\b/g,' ');
+      s = s.replace(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g,' ');
+      s = s.replace(/\+?[\d()\-\s]{10,}/g,' ');
+      s = s.replace(/\bRef:?\s*\S+/gi,' ');
+      s = s.replace(/^\s*\d{1,3}\s*[.|-]?\s*/,' ');
+      s = s.replace(/\b[A-Z]{2,}\d{5,}\b/g,' ');
+      s = s.replace(/[|]/g,' ').replace(/\s{2,}/g,' ').replace(/\s*,\s*,+/g, ',').trim();
+      return fixOcrArtifacts(s);
+    }
+
+    const NAME_PREFIX = /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sir|Lady|Lord)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?[, ]*/g;
+    const ALLCAPS_NAME_AT_START = /^[A-Z]{2,}(?:\s+[A-Z]{2,}){0,2}\s*,\s*/;
+    function removePersonalNames(s) { return s.replace(NAME_PREFIX,'').replace(ALLCAPS_NAME_AT_START,'').trim(); }
+
+    function normaliseAddressParts(parts) {
+      const kept = parts
+        .map(p=>p.trim())
+        .filter(p => p && (THOROUGHFARES.test(p) || UNIT_HINTS.test(p) || AREAS.test(p) || /\d+[A-Z]?/i.test(p)));
+      return Array.from(new Set(kept)).join(', ').replace(/\s*,\s*/g, ', ');
+    }
+
+    function reconstructFromLine(line) {
+      const fixed = removePersonalNames(stripMetadata(line));
+      const m = fixed.match(UK_POSTCODE_STRICT);
+      if (!m) return null;
+      const pc = m[1].toUpperCase().replace(/\s?([0-9][A-Z]{2})$/, ' $1');
+      const left = fixed.slice(0, m.index).replace(/\b(GB|UK)\b/gi,'').trim();
+      const right = fixed.slice(m.index + m[0].length).replace(/\b(GB|UK)\b/gi,'').trim();
+      const parts = (left + (right ? ' ' + right : '')).split(/[,|\n]+/).map(s=>s.trim()).filter(Boolean);
+      const addr = normaliseAddressParts(parts);
+      if (!addr) return null;
+      const final = `${addr}, ${pc} GB`.replace(/\s{2,}/g,' ').trim();
+      return final.length > 10 ? final : null;
+    }
+
+    function parseOcrToAddresses(text) {
+      updateProcessingStage(2, 'processing');
+      debugLog('🔍 Layer 2: parse OCR text');
+      const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+      const out = [];
+      let n = 1;
+      for (const raw of lines) {
+        if (!UK_POSTCODE_STRICT.test(raw)) continue;
+        const addr = reconstructFromLine(raw);
+        if (addr) out.push({ num: n++, address: addr });
+      }
+      updateProcessingStage(2, out.length ? 'complete' : 'error');
+      return out;
+    }
+
+    function validateAndCleanAddresses(addresses) {
+      updateProcessingStage(3, 'processing');
+      debugLog(`🔧 Layer 3-6: Deep cleaning ${addresses.length} addresses...`);
+      const valid = [];
+      const invalid = [];
+
+      for (const item of addresses) {
+        let address = typeof item === 'string' ? item : item.address;
+        if (typeof address !== 'string') continue;
+
+        address = fixOcrArtifacts(address);
+        const pcMatch = address.match(UK_POSTCODE_STRICT);
+        if (!pcMatch) {
+          const recon = reconstructFromLine(address);
+          if (recon) address = recon; else { invalid.push(address); continue; }
         }
 
-        // ==================== DEBUG LOGGING ====================
-        function debugLog(message, data = null) {
-            if (!debugMode) return;
-            const panel = document.getElementById('debugPanel');
-            if (!panel) return;
-            panel.classList.remove('hidden');
-            const timestamp = new Date().toLocaleTimeString();
-            if (data) {
-                panel.innerHTML += `<div>[${timestamp}] ${message}</div><pre>${JSON.stringify(data, null, 2)}</pre>`;
-            } else {
-                panel.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-            }
-            panel.scrollTop = panel.scrollHeight;
+        if (!/\b(GB|UK)\b$/i.test(address)) address += ' GB';
+        address = address.replace(/\b(Deadline|Service Level|Del Weight|Del Items|Ref):[^,]*/gi,'')
+                         .replace(/\|\s*/g,'')
+                         .replace(/\s+/g,' ')
+                         .trim();
+
+        if (address.length > 15 && UK_POSTCODE_STRICT.test(address)) {
+          valid.push({ num: item.num || (valid.length + 1), address });
+          debugLog(`✅ Valid: ${address}`);
+        } else {
+          invalid.push(address);
+          debugLog(`❌ Invalid: ${address}`);
         }
-        
-        function updateProcessingStage(stage, status) {
-            const stageEl = document.getElementById(`stage-${stage}`);
-            if (!stageEl) return;
-            
-            stageEl.className = `processing-stage ${status}`;
-            const icon = stageEl.querySelector('.icon');
-            
-            switch(status) {
-                case 'processing':
-                    icon.textContent = '⏳';
-                    break;
-                case 'complete':
-                    icon.textContent = '✓';
-                    break;
-                case 'error':
-                    icon.textContent = '✗';
-                    break;
-                default:
-                    icon.textContent = '○';
-            }
-        }
+      }
 
-        // ==================== ULTRA-SPECIFIC CLAUDE PROMPT ====================
-        const ULTRA_CLAUDE_PROMPT = `You are an EXPERT at extracting UK delivery addresses from logistics run sheets. These documents contain structured delivery information in table format.
+      // Deduplicate (case-insensitive)
+      const seen = new Set();
+      const dedup = [];
+      for (const a of valid) {
+        const key = a.address.toUpperCase();
+        if (!seen.has(key)) { seen.add(key); dedup.push(a); }
+      }
 
-CRITICAL MISSION: Extract COMPLETE delivery addresses with UK postcodes. Be EXTREMELY careful to get the FULL address.
+      updateProcessingStage(3, 'complete');
+      return { valid: dedup, invalid };
+    }
 
-DOCUMENT STRUCTURE:
-- Column 1: Stop number (1, 2, 3...)
-- Column 2: Consignment ID (7 digits like 0123456)
-- Column 3: THE ADDRESS (this is what we need!)
-- Column 4: Metadata (Del Weight, Del Items, Contact, Signature, etc.)
-
-UK POSTCODE FORMAT:
-- Pattern: [A-Z]{1,2}[0-9]{1,2}[A-Z]? [0-9][A-Z]{2}
-- Examples: HA6 2WQ, HA5 3PB, W1A 1AA, SW1A 1AA
-- EVERY address MUST have a UK postcode
-
-EXTRACTION RULES:
-1. Find the ADDRESS column (usually after consignment number)
-2. Extract the COMPLETE address including:
-   - Building/flat number or name
-   - Street name
-   - Area/district
-   - City/town
-   - County (if present)
-   - UK Postcode
-   - GB suffix
-
-3. REMOVE these things:
-   - Person names at the start (Mr/Mrs/Ms Smith, JOHN DOE, etc.)
-   - "Delivery" or "Collection" labels
-   - All metadata: Del Weight, Del Items, Deadline, Service Level, Contact Nos, Remarks, Signature, Ref
-   - Phone numbers
-   - Times (12:00, 22:00)
-   - Reference codes
-
-4. KEEP business names if they are the location:
-   - "Tesco Express" ✓
-   - "The White Swan Pub" ✓
-   - "John Smith" ✗ (person's name)
-
-EXAMPLES:
-Input line: "17 | 0234567 | Mrs. Kay Levy, Flat 3, Oak House, 101 Ducks Hill Road, Northwood, Middlesex HA6 1NJ GB | Del Weight: 5kg | Deadline: 22:00"
-Extract: "Flat 3, Oak House, 101 Ducks Hill Road, Northwood, Middlesex HA6 1NJ GB"
-
-Input line: "38 | 0345678 | Delivery | 6 Tilbury Close, Pinner, Middlesex HA5 4QA GB | Del Items: 1 | Deadline: 12:00"
-Extract: "6 Tilbury Close, Pinner, Middlesex HA5 4QA GB"
-
-IMPORTANT:
-- Extract ALL stops from the image
-- Each address MUST have a valid UK postcode
-- Remove ALL personal names (keep only business/building names)
-- Get the COMPLETE address, not fragments
-- If you see fragments like "Deadline: 22:00 Middlesex HA4 7LN GB", reconstruct to proper address
-
-OUTPUT FORMAT - Return ONLY valid JSON:
-[
-  {
-    "num": 1,
-    "address": "Flat 3, Oak House, 101 Ducks Hill Road, Northwood, Middlesex HA6 1NJ GB"
-  },
-  {
-    "num": 2,
-    "address": "6 Tilbury Close, Pinner, Middlesex HA5 4QA GB"
-  }
-]
-
-RETURN ONLY THE JSON ARRAY, NO OTHER TEXT.`;
-
-        // ==================== CLAUDE VISION API CALL ====================
-        async function processWithClaudeVision(base64, mediaType, filename) {
-            updateProcessingStage(1, 'processing');
-            debugLog('🧠 Layer 1: Sending to Claude Vision AI...', { filename });
-            
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 120000);
-
+    // ==================== IMAGE PRE-PROCESS ====================
+    async function preprocessImage(file, produceBase64 = false) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.onload = () => {
             try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': apiKey,
-                        'anthropic-version': '2023-06-01'
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-3-5-sonnet-20241022',
-                        max_tokens: 8000,
-                        temperature: 0,
-                        messages: [{
-                            role: 'user',
-                            content: [
-                                {
-                                    type: 'image',
-                                    source: { type: 'base64', media_type: mediaType, data: base64 }
-                                },
-                                {
-                                    type: 'text',
-                                    text: ULTRA_CLAUDE_PROMPT
-                                }
-                            ]
-                        }]
-                    }),
-                    signal: controller.signal
-                });
+              const canvas = document.getElementById('previewCanvas');
+              const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-                clearTimeout(timeout);
+              // Resize limits (faster OCR)
+              const MAX_W = 1800, MAX_H = 2400;
+              let w = img.width, h = img.height;
+              const r = Math.min(1, MAX_W / w, MAX_H / h);
+              canvas.width = Math.round(w * r);
+              canvas.height = Math.round(h * r);
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || `API error: ${response.status}`);
-                }
+              // Get image data
+              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              const data = imageData.data;
 
-                const data = await response.json();
-                const text = data.content[0].text;
-                
-                updateProcessingStage(1, 'complete');
-                debugLog('✅ Layer 1: Claude Vision response received', { 
-                    responseLength: text.length,
-                    usage: data.usage 
-                });
-                
-                return text;
-                
-            } catch (error) {
-                clearTimeout(timeout);
-                updateProcessingStage(1, 'error');
-                debugLog('❌ Layer 1 Failed: ' + error.message);
-                throw error;
-            }
-        }
+              debugLog('📸 Advanced pre-processing: ' + file.name);
 
-        // ==================== MULTI-LAYER PROCESSING ====================
-        function parseClaudeResponse(text) {
-            updateProcessingStage(2, 'processing');
-            debugLog('🔍 Layer 2: Parsing Claude response...');
-            
-            let addresses = [];
-            
-            // Try to extract JSON
-            let jsonMatch = text.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) {
-                jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-                if (jsonMatch) {
-                    jsonMatch = [jsonMatch[1]];
-                }
-            }
-            
-            if (jsonMatch) {
-                try {
-                    const parsed = JSON.parse(jsonMatch[0]);
-                    if (Array.isArray(parsed)) {
-                        addresses = parsed;
-                        debugLog(`✅ Layer 2: Parsed ${addresses.length} addresses from JSON`);
+              // 1) Greyscale
+              for (let i = 0; i < data.length; i += 4) {
+                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                data[i] = data[i + 1] = data[i + 2] = gray;
+              }
+              // 2) Contrast
+              const cf = 1.5;
+              for (let i = 0; i < data.length; i += 4) {
+                const v = Math.min(255, Math.max(0, (data[i] - 128) * cf + 128));
+                data[i] = data[i + 1] = data[i + 2] = v;
+              }
+              // 3) Sharpen kernel
+              const width = canvas.width, height = canvas.height;
+              const kernel = [0,-1,0,-1,5,-1,0,-1,0];
+              const out = new Uint8ClampedArray(data);
+              for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                  let sum = 0;
+                  for (let ky = -1; ky <= 1; ky++) {
+                    for (let kx = -1; kx <= 1; kx++) {
+                      const idx = ((y + ky) * width + (x + kx)) * 4;
+                      const kidx = (ky + 1) * 3 + (kx + 1);
+                      sum += data[idx] * kernel[kidx];
                     }
-                } catch (e) {
-                    debugLog('⚠️ Layer 2: JSON parse failed, trying fallback');
+                  }
+                  const idx = (y * width + x) * 4;
+                  out[idx] = out[idx + 1] = out[idx + 2] = Math.min(255, Math.max(0, sum));
                 }
-            }
-            
-            // Fallback: Extract addresses from raw text
-            if (addresses.length === 0) {
-                debugLog('🔄 Layer 2: Using fallback text extraction');
-                addresses = extractAddressesFromText(text);
-            }
-            
-            updateProcessingStage(2, addresses.length > 0 ? 'complete' : 'error');
-            return addresses;
-        }
-        
-        function extractAddressesFromText(text) {
-            const addresses = [];
-            const lines = text.split('\n');
-            let stopNum = 1;
-            
-            for (let line of lines) {
-                // Look for lines with UK postcodes
-                const postcodes = extractPostcodes(line);
-                if (postcodes.length > 0) {
-                    // Try to reconstruct address from this line
-                    const address = reconstructAddress(line);
-                    if (address) {
-                        addresses.push({
-                            num: stopNum++,
-                            address: address
-                        });
-                    }
-                }
-            }
-            
-            return addresses;
-        }
-        
-        function validateAndCleanAddresses(addresses) {
-            updateProcessingStage(3, 'processing');
-            debugLog(`🔧 Layer 3-6: Deep cleaning ${addresses.length} addresses...`);
-            
-            const validAddresses = [];
-            const invalidAddresses = [];
-            
-            addresses.forEach(item => {
-                let address = item.address || item;
-                if (typeof address !== 'string') return;
-                
-                // Layer 3: Deep clean
-                address = deepCleanAddress(address);
-                
-                // Layer 4: Extract postcode
-                const postcodes = extractPostcodes(address);
-                if (postcodes.length === 0) {
-                    // Try to reconstruct
-                    const reconstructed = reconstructAddress(address);
-                    if (reconstructed) {
-                        address = reconstructed;
-                    } else {
-                        debugLog(`⚠️ Skipping (no postcode): ${address}`);
-                        invalidAddresses.push(address);
-                        return;
-                    }
-                }
-                
-                // Layer 5: Final normalization
-                if (!address.toUpperCase().endsWith(' GB')) {
-                    address += ' GB';
-                }
-                
-                // Remove any remaining fragments
-                address = address.replace(/\b(Deadline|Service Level|Del Weight|Del Items|Ref):[^,]*/gi, '');
-                address = address.replace(/\|\s*/g, '');
-                address = address.replace(/\s+/g, ' ').trim();
-                
-                if (address.length > 15 && extractPostcodes(address).length > 0) {
-                    validAddresses.push({
-                        num: item.num || validAddresses.length + 1,
-                        address: address
-                    });
-                    debugLog(`✅ Valid: ${address}`);
-                } else {
-                    invalidAddresses.push(address);
-                    debugLog(`❌ Invalid: ${address}`);
-                }
-            });
-            
-            updateProcessingStage(3, 'complete');
-            updateProcessingStage(4, 'complete');
-            updateProcessingStage(5, 'complete');
-            
-            debugLog(`✅ Results: ${validAddresses.length} valid, ${invalidAddresses.length} invalid`);
-            
-            return { valid: validAddresses, invalid: invalidAddresses };
-        }
+              }
+              // 4) Threshold
+              const threshold = 180;
+              for (let i = 0; i < out.length; i += 4) {
+                const v = out[i] > threshold ? 255 : out[i] < 60 ? 0 : out[i];
+                out[i] = out[i + 1] = out[i + 2] = v;
+              }
+              ctx.putImageData(new ImageData(out, width, height), 0, 0);
 
-        // ==================== FILE HANDLING ====================
-        function imageToBase64(file, preprocess = true) {
-            if (preprocess && enablePreprocessing) {
-                return preprocessImage(file);
-            }
-            
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    try {
-                        resolve(reader.result.split(',')[1]);
-                    } catch (e) {
-                        reject(new Error('Failed to encode image'));
-                    }
-                };
-                reader.onerror = () => reject(new Error('Failed to read file'));
-                reader.readAsDataURL(file);
-            });
-        }
+              if (document.getElementById('enablePreprocessing').checked) {
+                canvas.classList.remove('hidden');
+              }
 
-        // ==================== MAIN PROCESSING ====================
-        async function processImages() {
-            if (images.length === 0) {
-                showError('Please upload at least one image');
+              if (!produceBase64) {
+                resolve(null);
                 return;
-            }
+              }
 
-            if (!apiKey || !apiKey.startsWith('sk-ant-')) {
-                showError('Please add a valid API key first');
-                showApiKeyModal();
-                return;
-            }
-
-            isProcessing = true;
-            enablePreprocessing = document.getElementById('enablePreprocessing').checked;
-            enableManualEdit = document.getElementById('enableManualEdit').checked;
-            debugMode = document.getElementById('enableDebug').checked;
-            updateProcessButton();
-            
-            document.getElementById('errorSection').classList.add('hidden');
-            document.getElementById('resultsSection').classList.add('hidden');
-            document.getElementById('extractedSection').classList.add('hidden');
-            document.getElementById('instructionsSection').classList.add('hidden');
-            document.getElementById('progressSection').classList.remove('hidden');
-            document.getElementById('debugPanel').innerHTML = '';
-            
-            // Setup processing stages
-            const stagesHtml = `
-                <div id="stage-0" class="processing-stage pending">
-                    <div class="icon">○</div>
-                    <div>Layer 0: Image Pre-Processing</div>
-                </div>
-                <div id="stage-1" class="processing-stage pending">
-                    <div class="icon">○</div>
-                    <div>Layer 1: Claude Vision AI Extraction</div>
-                </div>
-                <div id="stage-2" class="processing-stage pending">
-                    <div class="icon">○</div>
-                    <div>Layer 2: JSON Parsing & Fallback</div>
-                </div>
-                <div id="stage-3" class="processing-stage pending">
-                    <div class="icon">○</div>
-                    <div>Layer 3-6: Deep Cleaning & Validation</div>
-                </div>
-            `;
-            document.getElementById('processingStages').innerHTML = stagesHtml;
-            
-            debugLog('🚀 Starting 7-layer ultra-robust processing...');
-            debugLog(`Pre-processing: ${enablePreprocessing ? 'ENABLED' : 'DISABLED'}`);
-            debugLog(`Manual editing: ${enableManualEdit ? 'ENABLED' : 'DISABLED'}`);
-            
-            const allAddresses = [];
-            const allInvalid = [];
-            let failedImages = 0;
-            let processedSuccessfully = 0;
-
-            try {
-                for (let i = 0; i < images.length; i++) {
-                    const progress = ((i + 1) / images.length) * 100;
-                    document.getElementById('progressBar').style.width = progress + '%';
-                    document.getElementById('progressText').textContent = 
-                        `Processing image ${i + 1}/${images.length}... (${images[i].name})`;
-                    
-                    debugLog(`\n📸 IMAGE ${i + 1}/${images.length}: ${images[i].name}`);
-
-                    try {
-                        // Stage 0: Pre-processing
-                        if (enablePreprocessing) {
-                            updateProcessingStage(0, 'processing');
-                        }
-                        
-                        const base64 = await imageToBase64(images[i], enablePreprocessing);
-                        
-                        if (enablePreprocessing) {
-                            updateProcessingStage(0, 'complete');
-                        }
-                        
-                        // Stage 1-3: Claude processing
-                        const responseText = await processWithClaudeVision(base64, images[i].type, images[i].name);
-                        const parsedAddresses = parseClaudeResponse(responseText);
-                        const { valid, invalid } = validateAndCleanAddresses(parsedAddresses);
-                        
-                        if (valid.length > 0) {
-                            allAddresses.push(...valid);
-                            processedSuccessfully++;
-                            debugLog(`✅ Image ${i + 1}: ${valid.length} valid addresses`);
-                        }
-                        
-                        if (invalid.length > 0) {
-                            allInvalid.push(...invalid);
-                            debugLog(`⚠️ Image ${i + 1}: ${invalid.length} invalid/skipped`);
-                        }
-                        
-                        if (valid.length === 0 && invalid.length === 0) {
-                            failedImages++;
-                            debugLog(`❌ Image ${i + 1}: No addresses found`);
-                        }
-                        
-                    } catch (imgError) {
-                        debugLog(`❌ Image ${i + 1} error: ${imgError.message}`);
-                        failedImages++;
-                        
-                        if (imgError.message.includes('authentication') || imgError.message.includes('API key')) {
-                            throw imgError;
-                        }
-                    }
-                    
-                    // Small delay between images
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                }
-
-                debugLog('\n🔄 Final processing...');
-                
-                // Remove duplicates and sort
-                const uniqueAddresses = allAddresses
-                    .filter((addr, index, self) => 
-                        index === self.findIndex(a => a.address === addr.address)
-                    )
-                    .sort((a, b) => a.num - b.num);
-
-                debugLog(`✅ Final: ${uniqueAddresses.length} unique addresses`);
-                
-                // Update statistics
-                document.getElementById('totalExtracted').textContent = allAddresses.length;
-                document.getElementById('validAddresses').textContent = uniqueAddresses.length;
-                document.getElementById('invalidAddresses').textContent = allInvalid.length;
-                
-                extractedAddresses = uniqueAddresses;
-                
-                if (uniqueAddresses.length > 0) {
-                    // Show extracted addresses for editing
-                    document.getElementById('extractedSection').classList.remove('hidden');
-                    const editor = document.getElementById('addressEditor');
-                    editor.value = uniqueAddresses.map(a => a.address).join('\n');
-                    
-                    if (!enableManualEdit) {
-                        // Generate routes immediately
-                        generateRoutes();
-                    }
-                } else {
-                    throw new Error(
-                        `❌ No valid addresses extracted from ${images.length} image(s).\n\n` +
-                        `Troubleshooting:\n` +
-                        `1. Ensure images are clear UK delivery run sheets\n` +
-                        `2. Check that UK postcodes are visible (HA6 2WQ format)\n` +
-                        `3. Try enabling Image Pre-Processing\n` +
-                        `4. Check Debug Information for details\n\n` +
-                        `Processed: ${processedSuccessfully}/${images.length} images\n` +
-                        `Invalid addresses: ${allInvalid.length}`
-                    );
-                }
-                
-                if (failedImages > 0) {
-                    showWarning(`⚠️ ${failedImages}/${images.length} images failed or had no valid addresses`);
-                }
-
+              canvas.toBlob((blob) => {
+                const processedReader = new FileReader();
+                processedReader.onload = () => resolve(processedReader.result.split(',')[1]);
+                processedReader.onerror = reject;
+                processedReader.readAsDataURL(blob);
+              }, 'image/jpeg', 0.78);
             } catch (err) {
-                debugLog(`\n❌ FATAL ERROR: ${err.message}`);
-                showError(err.message);
-                
-                for (let i = 0; i <= 5; i++) {
-                    updateProcessingStage(i, 'error');
-                }
-            } finally {
-                isProcessing = false;
-                setTimeout(() => {
-                    document.getElementById('progressSection').classList.add('hidden');
-                }, 2000);
-                updateProcessButton();
+              debugLog('❌ Pre-processing error: ' + err.message);
+              reject(err);
             }
-        }
-        
-        function generateRoutes() {
-            const editor = document.getElementById('addressEditor');
-            const addresses = editor.value
-                .split('\n')
-                .map(addr => addr.trim())
-                .filter(addr => addr.length > 0);
-            
-            if (addresses.length === 0) {
-                showError('No addresses to generate routes');
-                return;
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ==================== OCR WORKER (robust init) ====================
+    async function getOcrWorker() {
+      if (tesseractWorker) return tesseractWorker;
+      tesseractWorker = await Tesseract.createWorker({ logger: (m) => debugMode && debugLog(`🧩 OCR: ${m.status || ''} ${Math.round((m.progress || 0)*100)}%`) });
+      await tesseractWorker.load();
+      await tesseractWorker.loadLanguage('eng');
+      await tesseractWorker.initialize('eng');
+      await tesseractWorker.setParameters({
+        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+        tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.-:/#()[]|&'\""
+      });
+      return tesseractWorker;
+    }
+    async function releaseOcrWorker() {
+      if (tesseractWorker) {
+        await tesseractWorker.terminate();
+        tesseractWorker = null;
+      }
+    }
+    async function processWithOCRFromCanvas(canvas, filename) {
+      updateProcessingStage(1, 'processing');
+      debugLog('🧠 Layer 1: OCR (Tesseract) starting...', { filename });
+      try {
+        const worker = await getOcrWorker();
+        const { data } = await worker.recognize(canvas);
+        updateProcessingStage(1, 'complete');
+        debugLog('✅ Layer 1: OCR done', { length: (data.text || '').length });
+        return data.text || '';
+      } catch (err) {
+        updateProcessingStage(1, 'error');
+        debugLog('❌ Layer 1 failed: ' + err.message);
+        throw err;
+      }
+    }
+
+    // ==================== MAIN ====================
+    async function processImages() {
+      if (images.length === 0) { showError('Please upload at least one image'); return; }
+
+      isProcessing = true;
+      enablePreprocessing = document.getElementById('enablePreprocessing').checked;
+      enableManualEdit = document.getElementById('enableManualEdit').checked;
+      debugMode = document.getElementById('enableDebug').checked;
+      updateProcessButton();
+
+      document.getElementById('errorSection').classList.add('hidden');
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('extractedSection').classList.add('hidden');
+      document.getElementById('instructionsSection').classList.add('hidden');
+      document.getElementById('progressSection').classList.remove('hidden');
+      document.getElementById('debugPanel').innerHTML = '';
+
+      const stagesHtml = `
+        <div id="stage-0" class="processing-stage pending"><div class="icon">○</div><div>Layer 0: Image Pre-Processing</div></div>
+        <div id="stage-1" class="processing-stage pending"><div class="icon">○</div><div>Layer 1: OCR Extraction</div></div>
+        <div id="stage-2" class="processing-stage pending"><div class="icon">○</div><div>Layer 2: Parse & Reconstruct</div></div>
+        <div id="stage-3" class="processing-stage pending"><div class="icon">○</div><div>Layer 3-6: Cleaning & Validation</div></div>
+      `;
+      document.getElementById('processingStages').innerHTML = stagesHtml;
+
+      debugLog('🚀 Starting 7-layer processing...');
+      debugLog(`Pre-processing: ${enablePreprocessing ? 'ENABLED' : 'DISABLED'}`);
+      debugLog(`Manual editing: ${enableManualEdit ? 'ENABLED' : 'DISABLED'}`);
+
+      const allAddresses = [];
+      const allInvalid = [];
+      let failedImages = 0;
+      let processedSuccessfully = 0;
+
+      try {
+        await getOcrWorker();
+
+        for (let i = 0; i < images.length; i++) {
+          const progress = ((i + 1) / images.length) * 100;
+          document.getElementById('progressBar').style.width = progress + '%';
+          document.getElementById('progressText').textContent = `Processing image ${i + 1}/${images.length}... (${images[i].name})`;
+          debugLog(`\n📸 IMAGE ${i + 1}/${images.length}: ${images[i].name}`);
+
+          try {
+            if (enablePreprocessing) updateProcessingStage(0, 'processing');
+            await preprocessImage(images[i], /*produceBase64*/ false);
+            if (enablePreprocessing) updateProcessingStage(0, 'complete');
+
+            const canvas = document.getElementById('previewCanvas');
+            const ocrText = await processWithOCRFromCanvas(canvas, images[i].name);
+            const parsed = parseOcrToAddresses(ocrText);
+            const { valid, invalid } = validateAndCleanAddresses(parsed);
+
+            if (valid.length > 0) {
+              allAddresses.push(...valid);
+              processedSuccessfully++;
+              debugLog(`✅ Image ${i + 1}: ${valid.length} valid addresses`);
             }
-            
-            // Group into routes (max 14 stops per route for Apple Maps)
-            const groups = [];
-            const maxStopsPerGroup = 14;
-            
-            for (let i = 0; i < addresses.length; i += maxStopsPerGroup) {
-                const group = addresses.slice(i, Math.min(i + maxStopsPerGroup, addresses.length));
-                const destinations = group.map(addr => encodeURIComponent(addr)).join('&daddr=');
-                groups.push({
-                    id: Math.floor(i / maxStopsPerGroup) + 1,
-                    startStop: i + 1,
-                    endStop: Math.min(i + maxStopsPerGroup, addresses.length),
-                    count: group.length,
-                    stops: group.map((addr, idx) => ({
-                        num: i + idx + 1,
-                        address: addr
-                    })),
-                    link: `https://maps.apple.com/?daddr=${destinations}`
-                });
+            if (invalid.length > 0) {
+              allInvalid.push(...invalid);
+              debugLog(`⚠️ Image ${i + 1}: ${invalid.length} invalid/skipped`);
             }
-            
-            displayResults(groups, addresses.length);
-        }
-        
-        function reprocessImages() {
-            processImages();
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        function updateApiKeyStatus() {
-            const statusDiv = document.getElementById('apiKeyStatus');
-            if (apiKey && apiKey.startsWith('sk-ant-')) {
-                statusDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <span>✓</span>
-                        <span>API Key configured</span>
-                        <button onclick="showApiKeyModal()" 
-                                style="background: var(--success); color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; margin-left: auto; font-size: 12px; font-weight: 600;">
-                            Change
-                        </button>
-                    </div>
-                `;
-            } else {
-                statusDiv.innerHTML = `
-                    <div class="alert alert-warning">
-                        <span>⚠️</span>
-                        <span>API Key required to process images</span>
-                        <button onclick="showApiKeyModal()" 
-                                style="background: var(--warning); color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; margin-left: auto; font-weight: 600;">
-                            Add Key
-                        </button>
-                    </div>
-                `;
+            if (valid.length === 0 && invalid.length === 0) {
+              failedImages++;
+              debugLog(`❌ Image ${i + 1}: No addresses found`);
             }
-            updateProcessButton();
+          } catch (imgError) {
+            debugLog(`❌ Image ${i + 1} error: ${imgError.message}`);
+            failedImages++;
+          }
+
+          await new Promise(r => setTimeout(r, 250));
         }
 
-        function updateImageList() {
-            const listDiv = document.getElementById('imageList');
-            const previewCanvas = document.getElementById('previewCanvas');
-            
-            if (images.length === 0) {
-                listDiv.innerHTML = '';
-                previewCanvas.classList.add('hidden');
-                return;
-            }
-            
-            const header = document.createElement('div');
-            header.style.cssText = 'color: var(--success); font-size: 14px; margin-bottom: 12px; font-weight: 600;';
-            header.textContent = `✓ ${images.length} image(s) selected`;
-            listDiv.innerHTML = '';
-            listDiv.appendChild(header);
-            
-            images.forEach((img, idx) => {
-                const item = document.createElement('div');
-                item.className = 'image-item';
-                item.innerHTML = `
-                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${img.name}</span>
-                    <span style="font-size: 11px; color: var(--gray-600); margin-right: 12px;">${formatFileSize(img.size)}</span>
-                    <button class="remove-btn" onclick="removeImage(${idx})">Remove</button>
-                `;
-                listDiv.appendChild(item);
-            });
+        debugLog('\n🔄 Final processing...');
+
+        const uniqueAddresses = allAddresses
+          .filter((addr, index, self) => index === self.findIndex(a => a.address === addr.address))
+          .sort((a, b) => a.num - b.num);
+
+        debugLog(`✅ Final: ${uniqueAddresses.length} unique addresses`);
+
+        document.getElementById('totalExtracted').textContent = allAddresses.length.toString();
+        document.getElementById('validAddresses').textContent = uniqueAddresses.length.toString();
+        document.getElementById('invalidAddresses').textContent = allInvalid.length.toString();
+
+        extractedAddresses = uniqueAddresses;
+
+        if (uniqueAddresses.length > 0) {
+          document.getElementById('extractedSection').classList.remove('hidden');
+          const editor = document.getElementById('addressEditor');
+          editor.value = uniqueAddresses.map(a => a.address).join('\n');
+          if (!enableManualEdit) generateRoutes();
+        } else {
+          throw new Error(
+            `❌ No valid addresses extracted from ${images.length} image(s).\n\n` +
+            `Troubleshooting:\n` +
+            `1. Ensure images are clear UK delivery run sheets\n` +
+            `2. Check that UK postcodes are visible (e.g., HA6 2WQ)\n` +
+            `3. Enable Image Pre-Processing\n` +
+            `4. Check Debug Information for details\n\n` +
+            `Processed: ${processedSuccessfully}/${images.length} images\n` +
+            `Invalid addresses: ${allInvalid.length}`
+          );
         }
 
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        if (failedImages > 0) {
+          showWarning(`⚠️ ${failedImages}/${images.length} images failed or had no valid addresses`);
         }
+      } catch (err) {
+        debugLog(`\n❌ FATAL ERROR: ${err.message}`);
+        showError(err.message);
+        for (let i = 0; i <= 5; i++) updateProcessingStage(i, 'error');
+      } finally {
+        await releaseOcrWorker();
+        isProcessing = false;
+        setTimeout(() => document.getElementById('progressSection').classList.add('hidden'), 1200);
+        updateProcessButton();
+      }
+    }
 
-        function removeImage(idx) {
-            images.splice(idx, 1);
-            updateImageList();
-            updateProcessButton();
-        }
+    function generateRoutes() {
+      const editor = document.getElementById('addressEditor');
+      const addresses = editor.value.split('\n').map(a=>a.trim()).filter(Boolean);
+      if (addresses.length === 0) { showError('No addresses to generate routes'); return; }
 
-        function updateProcessButton() {
-            const btn = document.getElementById('processBtn');
-            btn.disabled = !(images.length > 0 && apiKey && apiKey.startsWith('sk-ant-') && !isProcessing);
-            
-            if (isProcessing) {
-                btn.textContent = '⏳ Processing...';
-            } else {
-                btn.textContent = '🧠 Process with Ultra Robust AI (7 Layers)';
-            }
-        }
-
-        function showApiKeyModal() {
-            document.getElementById('apiKeyModal').style.display = 'flex';
-            document.getElementById('apiKeyInput').value = apiKey;
-        }
-
-        function closeModal() {
-            document.getElementById('apiKeyModal').style.display = 'none';
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key.startsWith('sk-ant-')) {
-                showError('Invalid API key. Must start with "sk-ant-"');
-                return;
-            }
-            apiKey = key;
-            localStorage.setItem('anthropic_api_key', key);
-            updateApiKeyStatus();
-            closeModal();
-            showSuccess('✓ API key saved successfully');
-        }
-
-        function displayResults(groups, totalStops) {
-            document.getElementById('resultsTitle').innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>✓ ${totalStops} Deliveries Ready</span>
-                    <span style="font-size: 14px; color: var(--gray-600);">
-                        ${groups.length} route(s) generated
-                    </span>
-                </div>
-            `;
-            
-            const list = document.getElementById('routesList');
-            list.innerHTML = '';
-
-            groups.forEach(g => {
-                const card = document.createElement('div');
-                card.className = 'route-card';
-                card.innerHTML = `
-                    <div class="route-header">
-                        <div>
-                            <div style="font-weight: 600; font-size: 18px;">Route ${g.id}</div>
-                            <div style="color: var(--gray-600); font-size: 13px;">
-                                Stops ${g.startStop}-${g.endStop}
-                            </div>
-                        </div>
-                        <div class="badge">${g.count} stops</div>
-                    </div>
-                    <a href="${g.link}" target="_blank" class="btn btn-primary" style="text-decoration: none;">
-                        🗺️ Open in Apple Maps
-                    </a>
-                    <button class="btn btn-secondary" onclick="copyLink('${g.link.replace(/'/g, "\\'")}')">
-                        📋 Copy Link
-                    </button>
-                    <button class="btn btn-secondary" onclick="copyAddresses(${g.id})">
-                        📄 Copy All Addresses
-                    </button>
-                    <div class="show-addresses" onclick="toggleAddresses(this)">
-                        ▼ Show ${g.count} addresses
-                    </div>
-                    <div class="address-list" id="addresses-${g.id}">
-                        ${g.stops.map(s => `
-                            <div class="address-item">
-                                <span class="stop-num">${s.num}.</span>
-                                ${s.address}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                list.appendChild(card);
-            });
-
-            document.getElementById('resultsSection').classList.remove('hidden');
-            document.getElementById('extractedSection').classList.add('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-        }
-
-        function toggleAddresses(el) {
-            const list = el.nextElementSibling;
-            if (list.style.display === 'block') {
-                list.style.display = 'none';
-                el.textContent = el.textContent.replace('▲', '▼');
-            } else {
-                list.style.display = 'block';
-                el.textContent = el.textContent.replace('▼', '▲');
-            }
-        }
-
-        function copyLink(link) {
-            navigator.clipboard.writeText(link)
-                .then(() => showSuccess('✓ Route link copied to clipboard'))
-                .catch(() => showError('❌ Failed to copy link'));
-        }
-
-        function copyAddresses(groupId) {
-            const addressList = document.getElementById(`addresses-${groupId}`);
-            const addresses = Array.from(addressList.querySelectorAll('.address-item'))
-                .map(item => item.textContent.trim())
-                .join('\n');
-            
-            navigator.clipboard.writeText(addresses)
-                .then(() => showSuccess('✓ All addresses copied to clipboard'))
-                .catch(() => showError('❌ Failed to copy addresses'));
-        }
-
-        function showError(message) {
-            const errorSection = document.getElementById('errorSection');
-            document.getElementById('errorText').innerHTML = message.replace(/\n/g, '<br>');
-            errorSection.classList.remove('hidden');
-            
-            setTimeout(() => {
-                errorSection.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-        }
-
-        function showSuccess(message) {
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-success';
-            alert.innerHTML = `<span>✓</span><span>${message}</span>`;
-            alert.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 3000);
-        }
-
-        function showWarning(message) {
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-warning';
-            alert.innerHTML = `<span>⚠️</span><span>${message}</span>`;
-            const extractedSection = document.getElementById('extractedSection');
-            if (!extractedSection.classList.contains('hidden')) {
-                extractedSection.prepend(alert);
-            }
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            updateApiKeyStatus();
-            
-            document.getElementById('imageInput').addEventListener('change', (e) => {
-                const newImages = Array.from(e.target.files)
-                    .filter(f => f.type.startsWith('image/') && f.size <= 10485760);
-                
-                if (newImages.length < e.target.files.length) {
-                    showWarning('Some images were skipped (not image files or > 10MB)');
-                }
-                
-                images = newImages;
-                updateImageList();
-                updateProcessButton();
-            });
-            
-            document.getElementById('processBtn').addEventListener('click', processImages);
-            
-            document.getElementById('enablePreprocessing').addEventListener('change', () => {
-                updateImageList();
-            });
-            
-            document.getElementById('enableDebug').addEventListener('change', (e) => {
-                debugMode = e.target.checked;
-            });
-            
-            document.getElementById('apiKeyModal').addEventListener('click', (e) => {
-                if (e.target.id === 'apiKeyModal') {
-                    closeModal();
-                }
-            });
-            
-            // Enter key in API modal
-            document.getElementById('apiKeyInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    saveApiKey();
-                }
-            });
+      const groups = [];
+      const maxStopsPerGroup = 14;
+      for (let i = 0; i < addresses.length; i += maxStopsPerGroup) {
+        const group = addresses.slice(i, Math.min(i + maxStopsPerGroup, addresses.length));
+        const destinations = group.map(addr => encodeURIComponent(addr)).join('&daddr=');
+        groups.push({
+          id: Math.floor(i / maxStopsPerGroup) + 1,
+          startStop: i + 1,
+          endStop: Math.min(i + maxStopsPerGroup, addresses.length),
+          count: group.length,
+          stops: group.map((addr, idx) => ({ num: i + idx + 1, address: addr })),
+          link: `https://maps.apple.com/?daddr=${destinations}`
         });
-    </script>
+      }
+      displayResults(groups, addresses.length);
+    }
+    function reprocessImages(){ processImages(); }
+
+    // ==================== UI ====================
+    function updateImageList() {
+      const listDiv = document.getElementById('imageList');
+      const previewCanvas = document.getElementById('previewCanvas');
+      if (images.length === 0) { listDiv.innerHTML = ''; previewCanvas.classList.add('hidden'); return; }
+      const header = document.createElement('div');
+      header.style.cssText = 'color: var(--success); font-size: 14px; margin-bottom: 12px; font-weight: 600;';
+      header.textContent = `✓ ${images.length} image(s) selected`;
+      listDiv.innerHTML = '';
+      listDiv.appendChild(header);
+      images.forEach((img, idx) => {
+        const item = document.createElement('div');
+        item.className = 'image-item';
+        item.innerHTML = `
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${escapeHtml(img.name)}</span>
+          <span style="font-size:11px;color:var(--gray-600);margin-right:12px">${formatFileSize(img.size)}</span>
+          <button class="remove-btn" onclick="removeImage(${idx})">Remove</button>`;
+        listDiv.appendChild(item);
+      });
+    }
+
+    function formatFileSize(bytes){ if(bytes<1024)return bytes+' B'; if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB'; return (bytes/(1024*1024)).toFixed(1)+' MB'; }
+    function removeImage(idx){ images.splice(idx,1); updateImageList(); updateProcessButton(); }
+    function updateProcessButton(){
+      const btn = document.getElementById('processBtn');
+      btn.disabled = !(images.length > 0 && !isProcessing);
+      btn.textContent = isProcessing ? '⏳ Processing...' : '🧠 Process with Ultra Robust AI (7 Layers)';
+    }
+
+    function displayResults(groups, totalStops) {
+      document.getElementById('resultsTitle').innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>✓ ${totalStops} Deliveries Ready</span>
+          <span style="font-size:14px;color:var(--gray-600)">${groups.length} route(s) generated</span>
+        </div>`;
+      const list = document.getElementById('routesList');
+      list.innerHTML = '';
+      groups.forEach(g => {
+        const card = document.createElement('div');
+        card.className = 'route-card';
+        card.innerHTML = `
+          <div class="route-header">
+            <div>
+              <div style="font-weight:600;font-size:18px">Route ${g.id}</div>
+              <div style="color:var(--gray-600);font-size:13px">Stops ${g.startStop}-${g.endStop}</div>
+            </div>
+            <div class="badge">${g.count} stops</div>
+          </div>
+          <a href="${g.link}" target="_blank" class="btn btn-primary" style="text-decoration:none">🗺️ Open in Apple Maps</a>
+          <button class="btn btn-secondary" onclick="copyLink('${g.link.replace(/'/g, "\\'")}')">📋 Copy Link</button>
+          <button class="btn btn-secondary" onclick="copyAddresses(${g.id})">📄 Copy All Addresses</button>
+          <div class="show-addresses" onclick="toggleAddresses(this)">▼ Show ${g.count} addresses</div>
+          <div class="address-list" id="addresses-${g.id}">
+            ${g.stops.map(s=>`
+              <div class="address-item"><span class="stop-num">${s.num}.</span>${escapeHtml(s.address)}</div>
+            `).join('')}
+          </div>`;
+        list.appendChild(card);
+      });
+      document.getElementById('resultsSection').classList.remove('hidden');
+      document.getElementById('extractedSection').classList.add('hidden');
+      setTimeout(()=>document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'}),100);
+    }
+
+    function toggleAddresses(el){
+      const list = el.nextElementSibling;
+      if (list.style.display === 'block'){ list.style.display='none'; el.textContent = el.textContent.replace('▲','▼'); }
+      else { list.style.display='block'; el.textContent = el.textContent.replace('▼','▲'); }
+    }
+
+    function copyLink(link){
+      navigator.clipboard.writeText(link).then(()=>showSuccess('✓ Route link copied to clipboard')).catch(()=>showError('❌ Failed to copy link'));
+    }
+    function copyAddresses(groupId){
+      const addressList = document.getElementById(`addresses-${groupId}`);
+      const addresses = Array.from(addressList.querySelectorAll('.address-item')).map(item=>item.textContent.trim()).join('\n');
+      navigator.clipboard.writeText(addresses).then(()=>showSuccess('✓ All addresses copied to clipboard')).catch(()=>showError('❌ Failed to copy addresses'));
+    }
+
+    function showError(message){
+      const errorSection = document.getElementById('errorSection');
+      document.getElementById('errorText').innerHTML = escapeHtml(message).replace(/\n/g,'<br>');
+      errorSection.classList.remove('hidden');
+      setTimeout(()=>errorSection.scrollIntoView({behavior:'smooth'}),100);
+    }
+    function showSuccess(message){
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-success';
+      alert.innerHTML = `<span>✓</span><span>${escapeHtml(message)}</span>`;
+      alert.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:250px';
+      document.body.appendChild(alert);
+      setTimeout(()=>alert.remove(),3000);
+    }
+    function showWarning(message){
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-warning';
+      alert.innerHTML = `<span>⚠️</span><span>${escapeHtml(message)}</span>`;
+      const extractedSection = document.getElementById('extractedSection');
+      if (!extractedSection.classList.contains('hidden')) extractedSection.prepend(alert);
+    }
+
+    // ==================== EVENTS ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('imageInput').addEventListener('change', (e) => {
+        const newImages = Array.from(e.target.files).filter(f => f.type.startsWith('image/') && f.size <= 10485760);
+        if (newImages.length < e.target.files.length) showWarning('Some images were skipped (not image files or > 10MB)');
+        images = newImages;
+        updateImageList();
+        updateProcessButton();
+      });
+      document.getElementById('processBtn').addEventListener('click', processImages);
+      document.getElementById('enablePreprocessing').addEventListener('change', () => updateImageList());
+      document.getElementById('enableDebug').addEventListener('change', (e) => { debugMode = e.target.checked; });
+      updateProcessButton();
+    });
+  </script>
 </body>
 </html>
