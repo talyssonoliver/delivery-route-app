@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>🧠 Ultra Robust Route Generator v3.1 (OCR)</title>
+  <title>🧠 Ultra Robust Route Generator v3.2 (OCR + Safe Loop)</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
@@ -17,14 +17,12 @@
     h3{font-size:18px;margin-bottom:12px;color:var(--gray-800)}
     .subtitle{color:var(--gray-600);font-size:14px;margin-bottom:16px}
     .version-badge{display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-left:8px}
-    .btn{padding:14px 20px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%}
+    .btn{padding:14px 20px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}
     .btn:disabled{background:var(--gray-300);cursor:not-allowed;opacity:.6}
     .btn-primary{background:var(--primary);color:#fff}
     .btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px)}
-    .btn-secondary{background:var(--gray-200);color:var(--gray-800);margin-top:8px}
-    .btn-small{padding:8px 16px;font-size:13px;width:auto}
+    .btn-secondary{background:var(--gray-200);color:var(--gray-800)}
     input[type="file"]{width:100%;padding:12px;border:2px dashed var(--gray-300);border-radius:8px;margin-bottom:12px;cursor:pointer;background:var(--gray-50)}
-    input[type="password"],input[type="text"]{width:100%;padding:12px 16px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;margin-bottom:12px}
     .checkbox-group{display:flex;align-items:center;gap:8px;margin:12px 0;padding:12px;background:var(--gray-50);border-radius:8px}
     .checkbox-group input[type="checkbox"]{width:18px;height:18px;cursor:pointer}
     .checkbox-group label{font-size:14px;cursor:pointer;user-select:none}
@@ -32,7 +30,6 @@
     .alert-warning{background:#fef5e7;border-left:4px solid var(--warning);color:#875a0f}
     .alert-error{background:#fee;border-left:4px solid var(--error);color:#742a2a}
     .alert-success{background:#e6fffa;border-left:4px solid var(--success);color:#234e52}
-    .alert-info{background:#ebf8ff;border-left:4px solid var(--primary);color:#2c5282}
     .progress{width:100%;height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden;margin:16px 0}
     .progress-bar{height:100%;background:linear-gradient(90deg,var(--primary) 0%,var(--secondary) 100%);transition:width .3s ease}
     .processing-stage{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:6px;margin-bottom:8px;font-size:13px}
@@ -52,13 +49,10 @@
     .address-item{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gray-200)}
     .address-item .stop-num{color:var(--primary);font-weight:700;margin-right:8px}
     .show-addresses{cursor:pointer;color:var(--primary);font-size:14px;margin-top:12px;user-select:none}
-    .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:1000;padding:20px}
-    .modal-content{background:#fff;border-radius:16px;padding:28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
     .hidden{display:none!important}
     .debug-panel{background:#1a202c;color:#48bb78;padding:16px;border-radius:8px;font-family:Monaco,monospace;font-size:11px;max-height:300px;overflow-y:auto;margin-top:16px}
     .debug-panel pre{white-space:pre-wrap;word-break:break-all}
     .preview-canvas{max-width:100%;border:1px solid var(--gray-300);border-radius:8px;margin-top:12px}
-    .enhancement-badge{display:inline-block;background:var(--success);color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-left:6px}
     .feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
     .feature-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--gray-50);border-radius:6px;font-size:13px}
     .feature-item .icon{font-size:18px}
@@ -74,8 +68,8 @@
 <body>
   <div class="container">
     <div class="card">
-      <h1>🧠 Ultra Robust Route Generator <span class="version-badge">v3.1 OCR</span></h1>
-      <div class="subtitle">Client-side OCR (Tesseract.js) + multi-layer UK address normalisation</div>
+      <h1>🧠 Ultra Robust Route Generator <span class="version-badge">v3.2 OCR</span></h1>
+      <div class="subtitle">Client-side OCR (Tesseract.js) + multi-layer UK address normalisation with safe cancellation</div>
       <div class="feature-list">
         <div class="feature-item"><span class="icon">🖼️</span><span>Advanced Image Pre-Processing</span></div>
         <div class="feature-item"><span class="icon">🔎</span><span>OCR (Tesseract.js)</span></div>
@@ -91,7 +85,6 @@
         <input type="checkbox" id="enablePreprocessing" checked />
         <label for="enablePreprocessing">
           <strong>Enable Advanced Image Pre-Processing</strong>
-          <span class="enhancement-badge">ENHANCED</span>
           <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Contrast enhancement, noise reduction, sharpening, OCR optimisation</div>
         </label>
       </div>
@@ -114,7 +107,10 @@
       <canvas id="previewCanvas" class="preview-canvas hidden"></canvas>
     </div>
 
-    <button id="processBtn" class="btn btn-primary" disabled>🧠 Process with Ultra Robust AI (7 Layers)</button>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button id="processBtn" class="btn btn-primary" disabled>🧠 Process with Ultra Robust AI (7 Layers)</button>
+      <button id="cancelBtn" class="btn btn-secondary" disabled>✖ Cancel</button>
+    </div>
 
     <div id="progressSection" class="hidden">
       <div class="card">
@@ -162,20 +158,12 @@
         <strong style="font-size:14px">🛡️ Processing Layers:</strong>
         <ul style="margin-top:10px;padding-left:20px;line-height:1.8">
           <li><strong>Layer 0:</strong> Advanced Image Pre-Processing (contrast, sharpen, denoise)</li>
-          <li><strong>Layer 1:</strong> OCR (Tesseract.js) from preprocessed canvas</li>
+          <li><strong>Layer 1:</strong> OCR (Tesseract.js) with timeout + fallback</li>
           <li><strong>Layer 2:</strong> Row parsing with postcode detection</li>
           <li><strong>Layer 3:</strong> Aggressive metadata removal</li>
           <li><strong>Layer 4:</strong> UK Postcode validation & spacing fix</li>
           <li><strong>Layer 5:</strong> Address reconstruction & normalisation</li>
           <li><strong>Layer 6:</strong> Manual editing & verification</li>
-        </ul>
-      </div>
-      <div style="margin-top:16px;padding:14px;background:#fef5e7;border-radius:8px;font-size:13px">
-        <strong>🔧 Notes:</strong>
-        <ul style="margin-top:8px;padding-left:20px;line-height:1.6">
-          <li>Removes personal names; keeps business/building names.</li>
-          <li>Groups into Apple Maps routes (max 14 stops).</li>
-          <li>All client-side; no API keys.</li>
         </ul>
       </div>
     </div>
@@ -187,16 +175,18 @@
   <script>
     'use strict';
 
-    // ==================== STATE ====================
+    // ===== STATE =====
     let images = [];
     let isProcessing = false;
+    let abortProcessing = false;
     let debugMode = false;
     let enablePreprocessing = true;
     let enableManualEdit = true;
     let extractedAddresses = [];
     let tesseractWorker = null;
 
-    // ==================== DEBUG ====================
+    // ===== DEBUG =====
+    function escapeHtml(s){return s.replace(/[&<>"']/g,(m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
     function debugLog(message, data = null) {
       if (!debugMode) return;
       const panel = document.getElementById('debugPanel');
@@ -204,14 +194,12 @@
       panel.classList.remove('hidden');
       const timestamp = new Date().toLocaleTimeString();
       if (data) {
-        panel.innerHTML += `<div>[${timestamp}] ${message}</div><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+        panel.innerHTML += `<div>[${timestamp}] ${escapeHtml(message)}</div><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
       } else {
         panel.innerHTML += `<div>[${timestamp}] ${escapeHtml(message)}</div>`;
       }
       panel.scrollTop = panel.scrollHeight;
     }
-    function escapeHtml(s){return s.replace(/[&<>"']/g,(m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
-
     function updateProcessingStage(stage, status) {
       const stageEl = document.getElementById(`stage-${stage}`);
       if (!stageEl) return;
@@ -225,14 +213,12 @@
       }
     }
 
-    // ==================== UK POSTCODES + RULES ====================
+    // ===== POSTCODES + RULES =====
     const UK_POSTCODE_STRICT = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/i;
     const UK_POSTCODE_FINDALL = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/gi;
-
     const THOROUGHFARES = /\b(Road|Rd|Street|St|Lane|Ln|Avenue|Ave|Drive|Dr|Close|Way|Place|Court|Gardens?|Square|Crescent|Cres|Grove|Park|Hill|View|Mews|Parade|Terrace|Walk|Row)\b/i;
     const UNIT_HINTS = /\b(Flat|Apt|Apartment|Unit|Suite|Room|Rm|House|Bldg|Building|Block)\b/i;
     const AREAS = /\b(London|Middlesex|Surrey|Kent|Essex|Herts|Hertfordshire|Bucks|Buckinghamshire|Berkshire|Oxfordshire|Bedfordshire|Hillingdon|Harrow|Ealing|Hounslow|Brent|Barnet|Camden|Westminster|Kensington|Chelsea|Islington|Southwark|Lambeth|Wandsworth|Ruislip|Pinner|Northwood|Eastcote|Ickenham|Uxbridge|Hayes|Stanmore)\b/i;
-
     const IGNORE_TOKENS = [
       'Del Weight','Del Items','Deadline','Service Level','Signature','Remarks',
       'Contact Nos','Ref','Name & Time','Security','Tracking','Barcode','Driver',
@@ -242,16 +228,15 @@
 
     function fixOcrArtifacts(s) {
       return s
-        .replace(/[\u2010-\u2015]/g, '-')     // dashes
-        .replace(/[|¦]/g, ' ')                // pipes
-        .replace(/\bHAO\b/gi, 'HA0')          // O->0
-        .replace(/\bHAG\b/gi, 'HA6')          // G->6
+        .replace(/[\u2010-\u2015]/g, '-')
+        .replace(/[|¦]/g, ' ')
+        .replace(/\bHAO\b/gi, 'HA0')
+        .replace(/\bHAG\b/gi, 'HA6')
         .replace(/\b([A-Z]{1,2}\d{1,2}[A-Z]?)\s*([0O]\w\w)\b/gi, (_, a, b)=>`${a} ${b.replace(/^O/,'0')}`)
-        .replace(/\b([A-Z]{1,2})\s+(\d)/g, '$1$2') // collapse outward space
+        .replace(/\b([A-Z]{1,2})\s+(\d)/g, '$1$2')
         .replace(/\s{2,}/g, ' ')
         .trim();
     }
-
     function stripMetadata(line) {
       let s = line;
       for (const kw of IGNORE_TOKENS) {
@@ -267,18 +252,15 @@
       s = s.replace(/[|]/g,' ').replace(/\s{2,}/g,' ').replace(/\s*,\s*,+/g, ',').trim();
       return fixOcrArtifacts(s);
     }
-
     const NAME_PREFIX = /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sir|Lady|Lord)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?[, ]*/g;
     const ALLCAPS_NAME_AT_START = /^[A-Z]{2,}(?:\s+[A-Z]{2,}){0,2}\s*,\s*/;
     function removePersonalNames(s) { return s.replace(NAME_PREFIX,'').replace(ALLCAPS_NAME_AT_START,'').trim(); }
-
     function normaliseAddressParts(parts) {
       const kept = parts
         .map(p=>p.trim())
         .filter(p => p && (THOROUGHFARES.test(p) || UNIT_HINTS.test(p) || AREAS.test(p) || /\d+[A-Z]?/i.test(p)));
       return Array.from(new Set(kept)).join(', ').replace(/\s*,\s*/g, ', ');
     }
-
     function reconstructFromLine(line) {
       const fixed = removePersonalNames(stripMetadata(line));
       const m = fixed.match(UK_POSTCODE_STRICT);
@@ -292,7 +274,6 @@
       const final = `${addr}, ${pc} GB`.replace(/\s{2,}/g,' ').trim();
       return final.length > 10 ? final : null;
     }
-
     function parseOcrToAddresses(text) {
       updateProcessingStage(2, 'processing');
       debugLog('🔍 Layer 2: parse OCR text');
@@ -300,37 +281,32 @@
       const out = [];
       let n = 1;
       for (const raw of lines) {
-        if (!UK_POSTCODE_STRICT.test(raw)) continue;
+        if (!UK_POSTCODE_FINDALL.test(raw)) continue;
         const addr = reconstructFromLine(raw);
         if (addr) out.push({ num: n++, address: addr });
       }
       updateProcessingStage(2, out.length ? 'complete' : 'error');
       return out;
     }
-
     function validateAndCleanAddresses(addresses) {
       updateProcessingStage(3, 'processing');
       debugLog(`🔧 Layer 3-6: Deep cleaning ${addresses.length} addresses...`);
       const valid = [];
       const invalid = [];
-
       for (const item of addresses) {
         let address = typeof item === 'string' ? item : item.address;
         if (typeof address !== 'string') continue;
-
         address = fixOcrArtifacts(address);
         const pcMatch = address.match(UK_POSTCODE_STRICT);
         if (!pcMatch) {
           const recon = reconstructFromLine(address);
           if (recon) address = recon; else { invalid.push(address); continue; }
         }
-
         if (!/\b(GB|UK)\b$/i.test(address)) address += ' GB';
         address = address.replace(/\b(Deadline|Service Level|Del Weight|Del Items|Ref):[^,]*/gi,'')
                          .replace(/\|\s*/g,'')
                          .replace(/\s+/g,' ')
                          .trim();
-
         if (address.length > 15 && UK_POSTCODE_STRICT.test(address)) {
           valid.push({ num: item.num || (valid.length + 1), address });
           debugLog(`✅ Valid: ${address}`);
@@ -339,20 +315,22 @@
           debugLog(`❌ Invalid: ${address}`);
         }
       }
-
-      // Deduplicate (case-insensitive)
-      const seen = new Set();
-      const dedup = [];
+      const seen = new Set(); const dedup = [];
       for (const a of valid) {
         const key = a.address.toUpperCase();
         if (!seen.has(key)) { seen.add(key); dedup.push(a); }
       }
-
       updateProcessingStage(3, 'complete');
       return { valid: dedup, invalid };
     }
 
-    // ==================== IMAGE PRE-PROCESS ====================
+    // ===== UTILS =====
+    function withTimeout(promise, ms, label='timeout') {
+      let t; const timer = new Promise((_, rej) => t = setTimeout(() => rej(new Error(label)), ms));
+      return Promise.race([promise.finally(() => clearTimeout(t)), timer]);
+    }
+
+    // ===== IMAGE PRE-PROCESS =====
     async function preprocessImage(file, produceBase64 = false) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -363,8 +341,8 @@
               const canvas = document.getElementById('previewCanvas');
               const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-              // Resize limits (faster OCR)
-              const MAX_W = 1800, MAX_H = 2400;
+              // Smaller limits for faster OCR
+              const MAX_W = 1400, MAX_H = 2000;
               let w = img.width, h = img.height;
               const r = Math.min(1, MAX_W / w, MAX_H / h);
               canvas.width = Math.round(w * r);
@@ -390,7 +368,7 @@
                 const v = Math.min(255, Math.max(0, (data[i] - 128) * cf + 128));
                 data[i] = data[i + 1] = data[i + 2] = v;
               }
-              // 3) Sharpen kernel
+              // 3) Sharpen
               const width = canvas.width, height = canvas.height;
               const kernel = [0,-1,0,-1,5,-1,0,-1,0];
               const out = new Uint8ClampedArray(data);
@@ -416,15 +394,23 @@
               }
               ctx.putImageData(new ImageData(out, width, height), 0, 0);
 
+              // Optional downscale after threshold to reduce OCR load
+              if (canvas.width > 1200) {
+                const tmp = document.createElement('canvas');
+                tmp.width = Math.round(canvas.width * 0.9);
+                tmp.height = Math.round(canvas.height * 0.9);
+                const tctx = tmp.getContext('2d');
+                tctx.drawImage(canvas, 0, 0, tmp.width, tmp.height);
+                canvas.width = tmp.width; canvas.height = tmp.height;
+                const c = canvas.getContext('2d');
+                c.drawImage(tmp, 0, 0);
+              }
+
               if (document.getElementById('enablePreprocessing').checked) {
                 canvas.classList.remove('hidden');
               }
 
-              if (!produceBase64) {
-                resolve(null);
-                return;
-              }
-
+              if (!produceBase64) { resolve(null); return; }
               canvas.toBlob((blob) => {
                 const processedReader = new FileReader();
                 processedReader.onload = () => resolve(processedReader.result.split(',')[1]);
@@ -444,7 +430,7 @@
       });
     }
 
-    // ==================== OCR WORKER (robust init) ====================
+    // ===== OCR WORKER + SAFE RECOGNITION =====
     async function getOcrWorker() {
       if (tesseractWorker) return tesseractWorker;
       tesseractWorker = await Tesseract.createWorker({ logger: (m) => debugMode && debugLog(`🧩 OCR: ${m.status || ''} ${Math.round((m.progress || 0)*100)}%`) });
@@ -459,30 +445,41 @@
     }
     async function releaseOcrWorker() {
       if (tesseractWorker) {
-        await tesseractWorker.terminate();
+        try { await tesseractWorker.terminate(); } catch {}
         tesseractWorker = null;
+      }
+    }
+    async function recognizeWithTimeout(canvas, msPrimary = 25000, msFallback = 20000) {
+      const worker = await getOcrWorker();
+      try {
+        await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK });
+        return await withTimeout(worker.recognize(canvas), msPrimary, 'OCR_TIMEOUT_PRIMARY');
+      } catch (e) {
+        debugLog(`⚠️ Primary OCR failed: ${e.message || e}`);
+        await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.AUTO_SPARSE_TEXT });
+        return await withTimeout(worker.recognize(canvas), msFallback, 'OCR_TIMEOUT_FALLBACK');
       }
     }
     async function processWithOCRFromCanvas(canvas, filename) {
       updateProcessingStage(1, 'processing');
-      debugLog('🧠 Layer 1: OCR (Tesseract) starting...', { filename });
+      debugLog('🧠 Layer 1: OCR start', { filename });
       try {
-        const worker = await getOcrWorker();
-        const { data } = await worker.recognize(canvas);
+        const { data } = await recognizeWithTimeout(canvas);
         updateProcessingStage(1, 'complete');
         debugLog('✅ Layer 1: OCR done', { length: (data.text || '').length });
         return data.text || '';
       } catch (err) {
         updateProcessingStage(1, 'error');
-        debugLog('❌ Layer 1 failed: ' + err.message);
+        debugLog('❌ Layer 1 failed: ' + (err.message || err));
         throw err;
       }
     }
 
-    // ==================== MAIN ====================
+    // ===== MAIN =====
     async function processImages() {
       if (images.length === 0) { showError('Please upload at least one image'); return; }
 
+      abortProcessing = false;
       isProcessing = true;
       enablePreprocessing = document.getElementById('enablePreprocessing').checked;
       enableManualEdit = document.getElementById('enableManualEdit').checked;
@@ -500,8 +497,7 @@
         <div id="stage-0" class="processing-stage pending"><div class="icon">○</div><div>Layer 0: Image Pre-Processing</div></div>
         <div id="stage-1" class="processing-stage pending"><div class="icon">○</div><div>Layer 1: OCR Extraction</div></div>
         <div id="stage-2" class="processing-stage pending"><div class="icon">○</div><div>Layer 2: Parse & Reconstruct</div></div>
-        <div id="stage-3" class="processing-stage pending"><div class="icon">○</div><div>Layer 3-6: Cleaning & Validation</div></div>
-      `;
+        <div id="stage-3" class="processing-stage pending"><div class="icon">○</div><div>Layer 3-6: Cleaning & Validation</div></div>`;
       document.getElementById('processingStages').innerHTML = stagesHtml;
 
       debugLog('🚀 Starting 7-layer processing...');
@@ -517,6 +513,8 @@
         await getOcrWorker();
 
         for (let i = 0; i < images.length; i++) {
+          if (abortProcessing) { debugLog('⛔ Aborted by user'); break; }
+
           const progress = ((i + 1) / images.length) * 100;
           document.getElementById('progressBar').style.width = progress + '%';
           document.getElementById('progressText').textContent = `Processing image ${i + 1}/${images.length}... (${images[i].name})`;
@@ -524,11 +522,16 @@
 
           try {
             if (enablePreprocessing) updateProcessingStage(0, 'processing');
-            await preprocessImage(images[i], /*produceBase64*/ false);
+            await preprocessImage(images[i], false);
             if (enablePreprocessing) updateProcessingStage(0, 'complete');
+
+            if (abortProcessing) { debugLog('⛔ Aborted post-preprocess'); break; }
 
             const canvas = document.getElementById('previewCanvas');
             const ocrText = await processWithOCRFromCanvas(canvas, images[i].name);
+
+            if (abortProcessing) { debugLog('⛔ Aborted post-OCR'); break; }
+
             const parsed = parseOcrToAddresses(ocrText);
             const { valid, invalid } = validateAndCleanAddresses(parsed);
 
@@ -546,11 +549,11 @@
               debugLog(`❌ Image ${i + 1}: No addresses found`);
             }
           } catch (imgError) {
-            debugLog(`❌ Image ${i + 1} error: ${imgError.message}`);
             failedImages++;
+            debugLog(`❌ Image ${i + 1} error: ${imgError.message || imgError}`);
           }
 
-          await new Promise(r => setTimeout(r, 250));
+          await new Promise(r => setTimeout(r, 200));
         }
 
         debugLog('\n🔄 Final processing...');
@@ -567,12 +570,12 @@
 
         extractedAddresses = uniqueAddresses;
 
-        if (uniqueAddresses.length > 0) {
+        if (!abortProcessing && uniqueAddresses.length > 0) {
           document.getElementById('extractedSection').classList.remove('hidden');
           const editor = document.getElementById('addressEditor');
           editor.value = uniqueAddresses.map(a => a.address).join('\n');
           if (!enableManualEdit) generateRoutes();
-        } else {
+        } else if (!abortProcessing) {
           throw new Error(
             `❌ No valid addresses extracted from ${images.length} image(s).\n\n` +
             `Troubleshooting:\n` +
@@ -584,19 +587,18 @@
             `Invalid addresses: ${allInvalid.length}`
           );
         }
-
         if (failedImages > 0) {
           showWarning(`⚠️ ${failedImages}/${images.length} images failed or had no valid addresses`);
         }
       } catch (err) {
-        debugLog(`\n❌ FATAL ERROR: ${err.message}`);
-        showError(err.message);
+        debugLog(`\n❌ FATAL ERROR: ${err.message || err}`);
+        showError(err.message || String(err));
         for (let i = 0; i <= 5; i++) updateProcessingStage(i, 'error');
       } finally {
-        await releaseOcrWorker();
+        try { await releaseOcrWorker(); } catch {}
         isProcessing = false;
-        setTimeout(() => document.getElementById('progressSection').classList.add('hidden'), 1200);
         updateProcessButton();
+        document.getElementById('progressSection').classList.add('hidden');
       }
     }
 
@@ -604,7 +606,6 @@
       const editor = document.getElementById('addressEditor');
       const addresses = editor.value.split('\n').map(a=>a.trim()).filter(Boolean);
       if (addresses.length === 0) { showError('No addresses to generate routes'); return; }
-
       const groups = [];
       const maxStopsPerGroup = 14;
       for (let i = 0; i < addresses.length; i += maxStopsPerGroup) {
@@ -623,7 +624,7 @@
     }
     function reprocessImages(){ processImages(); }
 
-    // ==================== UI ====================
+    // ===== UI =====
     function updateImageList() {
       const listDiv = document.getElementById('imageList');
       const previewCanvas = document.getElementById('previewCanvas');
@@ -643,15 +644,15 @@
         listDiv.appendChild(item);
       });
     }
-
     function formatFileSize(bytes){ if(bytes<1024)return bytes+' B'; if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB'; return (bytes/(1024*1024)).toFixed(1)+' MB'; }
     function removeImage(idx){ images.splice(idx,1); updateImageList(); updateProcessButton(); }
     function updateProcessButton(){
       const btn = document.getElementById('processBtn');
+      const cancel = document.getElementById('cancelBtn');
       btn.disabled = !(images.length > 0 && !isProcessing);
-      btn.textContent = isProcessing ? '⏳ Processing...' : '🧠 Process with Ultra Robust AI (7 Layers)';
+      cancel.disabled = !isProcessing;
+      btn.textContent = isProcessing ? '⏳ Processing…' : '🧠 Process with Ultra Robust AI (7 Layers)';
     }
-
     function displayResults(groups, totalStops) {
       document.getElementById('resultsTitle').innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -686,13 +687,11 @@
       document.getElementById('extractedSection').classList.add('hidden');
       setTimeout(()=>document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'}),100);
     }
-
     function toggleAddresses(el){
       const list = el.nextElementSibling;
       if (list.style.display === 'block'){ list.style.display='none'; el.textContent = el.textContent.replace('▲','▼'); }
       else { list.style.display='block'; el.textContent = el.textContent.replace('▼','▲'); }
     }
-
     function copyLink(link){
       navigator.clipboard.writeText(link).then(()=>showSuccess('✓ Route link copied to clipboard')).catch(()=>showError('❌ Failed to copy link'));
     }
@@ -701,7 +700,6 @@
       const addresses = Array.from(addressList.querySelectorAll('.address-item')).map(item=>item.textContent.trim()).join('\n');
       navigator.clipboard.writeText(addresses).then(()=>showSuccess('✓ All addresses copied to clipboard')).catch(()=>showError('❌ Failed to copy addresses'));
     }
-
     function showError(message){
       const errorSection = document.getElementById('errorSection');
       document.getElementById('errorText').innerHTML = escapeHtml(message).replace(/\n/g,'<br>');
@@ -724,7 +722,15 @@
       if (!extractedSection.classList.contains('hidden')) extractedSection.prepend(alert);
     }
 
-    // ==================== EVENTS ====================
+    // ===== GLOBAL FAIL-SAFE =====
+    window.addEventListener('unhandledrejection', (e) => {
+      debugLog('❗Unhandled rejection: ' + (e.reason?.message || e.reason));
+      isProcessing = false; abortProcessing = false;
+      try { document.getElementById('progressSection').classList.add('hidden'); } catch {}
+      updateProcessButton();
+    });
+
+    // ===== EVENTS =====
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('imageInput').addEventListener('change', (e) => {
         const newImages = Array.from(e.target.files).filter(f => f.type.startsWith('image/') && f.size <= 10485760);
@@ -734,6 +740,11 @@
         updateProcessButton();
       });
       document.getElementById('processBtn').addEventListener('click', processImages);
+      document.getElementById('cancelBtn').addEventListener('click', async () => {
+        abortProcessing = true;
+        showWarning('Cancelling…');
+        try { await releaseOcrWorker(); } catch {}
+      });
       document.getElementById('enablePreprocessing').addEventListener('change', () => updateImageList());
       document.getElementById('enableDebug').addEventListener('change', (e) => { debugMode = e.target.checked; });
       updateProcessButton();
