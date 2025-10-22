@@ -1,789 +1,862 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚚 Route Generator - Simplified & Working</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #4299e1;
-            --primary-dark: #3182ce;
-            --success: #38b2ac;
-            --warning: #f39c12;
-            --error: #e53e3e;
-            --gray-50: #f7fafc;
-            --gray-100: #edf2f7;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e0;
-            --gray-600: #718096;
-            --gray-800: #2d3748;
-            --gray-900: #1a202c;
-        }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        .card { 
-            background: white; 
-            border-radius: 16px; 
-            padding: 24px; 
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        h1 { 
-            font-size: clamp(20px, 5vw, 28px);
-            margin-bottom: 8px; 
-            color: var(--gray-900);
-            font-weight: 700;
-        }
-        h2 {
-            font-size: clamp(16px, 4vw, 20px);
-            margin-bottom: 16px;
-            color: var(--gray-800);
-            font-weight: 600;
-        }
-        .subtitle { 
-            color: var(--gray-600); 
-            font-size: 14px; 
-            margin-bottom: 16px; 
-        }
-        .btn {
-            width: 100%;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn:disabled { 
-            background: var(--gray-300);
-            cursor: not-allowed; 
-            opacity: 0.6;
-        }
-        .btn-primary { 
-            background: var(--primary); 
-            color: white; 
-        }
-        .btn-primary:hover:not(:disabled) { 
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-        .btn-secondary { 
-            background: var(--gray-200); 
-            color: var(--gray-800); 
-            margin-top: 8px; 
-        }
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px dashed var(--gray-300);
-            border-radius: 8px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            background: var(--gray-50);
-        }
-        input[type="password"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 12px;
-            font-family: 'Monaco', monospace;
-        }
-        .alert {
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .alert-warning { 
-            background: #fef5e7; 
-            border-left: 4px solid var(--warning); 
-            color: #875a0f; 
-        }
-        .alert-error { 
-            background: #fee; 
-            border-left: 4px solid var(--error); 
-            color: #742a2a; 
-        }
-        .alert-success { 
-            background: #e6fffa; 
-            border-left: 4px solid var(--success); 
-            color: #234e52; 
-        }
-        .alert-info {
-            background: #ebf8ff;
-            border-left: 4px solid var(--primary);
-            color: #2c5282;
-        }
-        .progress {
-            width: 100%;
-            height: 10px;
-            background: var(--gray-200);
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 16px 0;
-        }
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, #667eea 100%);
-            transition: width 0.3s ease;
-        }
-        .image-list {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 12px;
-        }
-        .image-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            background: var(--gray-50);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        .remove-btn {
-            color: var(--error);
-            cursor: pointer;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .route-card {
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        .route-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .badge {
-            background: #ebf8ff;
-            color: #2c5282;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .address-list {
-            max-height: 300px;
-            overflow-y: auto;
-            background: var(--gray-50);
-            padding: 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-top: 12px;
-            display: none;
-        }
-        .address-item {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        .show-addresses {
-            cursor: pointer;
-            color: var(--primary);
-            font-size: 14px;
-            margin-top: 12px;
-            user-select: none;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            max-width: 500px;
-            width: 90%;
-        }
-        .hidden { display: none !important; }
-        .debug-panel {
-            background: #1a202c;
-            color: #48bb78;
-            padding: 16px;
-            border-radius: 8px;
-            font-family: 'Monaco', monospace;
-            font-size: 11px;
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 16px;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-    </style>
+    <title>🚀 Unified Runsheet Processor - Working Version</title>
+
+```
+<!-- Load Tesseract.js for OCR -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- Load PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+    :root {
+        --bg: #0a0f1c;
+        --panel: #111927;
+        --border: #1f2937;
+        --text: #e2e8f0;
+        --muted: #64748b;
+        --accent: #fbbf24;
+        --warn: #f59e0b;
+        --err: #ef4444;
+        --ok: #10b981;
+        --radius: 8px;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    header {
+        text-align: center;
+        padding: 30px 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 30px;
+    }
+    
+    h1 {
+        font-size: 32px;
+        margin: 0 0 10px 0;
+    }
+    
+    .subtitle {
+        color: var(--muted);
+        font-size: 14px;
+    }
+    
+    .info-box {
+        background: #1a2a3a;
+        border: 1px solid #3498db;
+        color: #58a6ff;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        background: var(--panel);
+        padding: 10px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+    }
+    
+    .tab {
+        padding: 10px 20px;
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .tab:hover {
+        background: #1a1f2e;
+    }
+    
+    .tab.active {
+        background: var(--accent);
+        color: #000;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+    
+    .drop-zone {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 40px;
+        text-align: center;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        background: var(--bg);
+    }
+    
+    .drop-zone:hover {
+        border-color: var(--accent);
+        background: #0d1220;
+    }
+    
+    .drop-zone input[type=file] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .file-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px;
+        margin-top: 10px;
+        font-family: monospace;
+        font-size: 13px;
+        background: #0e1322;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .btn-primary {
+        background: var(--accent);
+        color: #000;
+    }
+    
+    .btn-secondary {
+        background: #222a3d;
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+    
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    
+    .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .kpi {
+        background: #0e1320;
+        border: 1px solid var(--border);
+        padding: 12px;
+        border-radius: 6px;
+        text-align: center;
+    }
+    
+    .kpi-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--accent);
+    }
+    
+    .kpi-label {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+    
+    .status {
+        font-family: monospace;
+        color: var(--muted);
+        white-space: pre-wrap;
+        max-height: 200px;
+        overflow: auto;
+        margin-top: 10px;
+        padding: 10px;
+        background: #0e1322;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+    }
+    
+    .preview {
+        margin-top: 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px;
+        font-family: monospace;
+        background: #0e1322;
+        max-height: 300px;
+        overflow: auto;
+        font-size: 12px;
+    }
+    
+    .log {
+        background: #0d1117;
+        color: #e6edf3;
+        padding: 12px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 250px;
+        overflow-y: auto;
+    }
+    
+    .log-entry {
+        margin-bottom: 4px;
+    }
+    
+    .log-entry.success { color: #7ee83f; }
+    .log-entry.error { color: #f85149; }
+    .log-entry.warning { color: #d29922; }
+    .log-entry.info { color: #58a6ff; }
+    
+    .hidden {
+        display: none !important;
+    }
+    
+    .progress {
+        height: 8px;
+        background: var(--bg);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: var(--accent);
+        transition: width 0.3s;
+    }
+    
+    textarea.form-control {
+        width: 100%;
+        min-height: 120px;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        font-family: monospace;
+        resize: vertical;
+    }
+    
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg);
+        color: var(--muted);
+        border: 1px solid var(--border);
+    }
+    
+    .badge.success {
+        background: #1a2a1a;
+        color: var(--ok);
+        border-color: var(--ok);
+    }
+</style>
+```
+
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h1>🚚 Route Generator - Simplified</h1>
-            <div class="subtitle">Simple, Direct, and Actually Works!</div>
-            <div id="apiKeyStatus"></div>
+        <header>
+            <h1>🚀 Unified Runsheet Processor</h1>
+            <p class="subtitle">Extract contacts & addresses from runsheets • Generate optimized routes • OCR support</p>
+        </header>
+
+```
+    <div class="info-box">
+        <strong>📋 How it works:</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>Upload PDF or image files of your runsheets</li>
+            <li>System uses OCR (Tesseract.js) to extract text from images</li>
+            <li>Extract contacts or addresses automatically</li>
+            <li>Generate GPS routes for delivery optimization</li>
+        </ul>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" data-tab="contacts">📞 Contact Extractor</button>
+        <button class="tab" data-tab="gpx">🗺️ Address/Route Generator</button>
+    </div>
+    
+    <div class="card">
+        <h3>📁 Upload Runsheet Files</h3>
+        <div class="drop-zone" id="dropZone">
+            <strong>Drop files here or click to browse</strong><br>
+            <small>Supports: PDF, JPG, PNG, GIF, BMP</small>
+            <input type="file" id="fileInput" accept=".pdf,image/*" multiple>
         </div>
-
-        <div class="card">
-            <h2>1. Upload Run Sheet Images</h2>
-            <input type="file" id="imageInput" multiple accept="image/*,application/pdf">
-            <div id="imageList" class="image-list"></div>
+        <div class="file-list" id="fileList">No files selected</div>
+        <div class="btn-group">
+            <button id="btnSortFiles" class="btn btn-secondary">🔢 Sort Files</button>
+            <button id="btnClearFiles" class="btn btn-secondary">🗑️ Clear All</button>
         </div>
-
-        <button id="processBtn" class="btn btn-primary" disabled>
-            🧠 Extract Addresses
-        </button>
-
-        <div id="progressSection" class="hidden">
-            <div class="card">
-                <div id="progressText" style="text-align: center; margin-bottom: 8px; font-size: 14px; font-weight: 500;"></div>
-                <div class="progress">
-                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+    </div>
+    
+    <div id="contacts-tab" class="tab-content active">
+        <div class="card">
+            <h3>📊 Contact Extraction</h3>
+            <div class="kpis">
+                <div class="kpi">
+                    <div class="kpi-value" id="kpiCons">0</div>
+                    <div class="kpi-label">Consignments</div>
                 </div>
-                <div id="debugPanel" class="debug-panel hidden"></div>
+                <div class="kpi">
+                    <div class="kpi-value" id="kpiContacts">0</div>
+                    <div class="kpi-label">With Contact</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-value" id="kpiSkipped">0</div>
+                    <div class="kpi-label">No Contact</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-value" id="kpiPercent">0%</div>
+                    <div class="kpi-label">Success Rate</div>
+                </div>
             </div>
+            <button id="btnExtractContacts" class="btn btn-primary" disabled style="margin-top: 15px;">
+                🔍 Extract Contacts
+            </button>
+            <div id="contactStatus" class="status hidden"></div>
+            <div id="contactPreview" class="preview hidden"></div>
         </div>
-
-        <div id="errorSection" class="hidden">
-            <div class="alert alert-error">
-                <span>⚠️</span>
-                <div id="errorText"></div>
+    </div>
+    
+    <div id="gpx-tab" class="tab-content">
+        <div class="card">
+            <h3>📍 Address Extraction</h3>
+            <textarea id="addresses" class="form-control" placeholder="Addresses will appear here after extraction"></textarea>
+            <div class="btn-group">
+                <button id="btnExtractAddresses" class="btn btn-primary" disabled>
+                    1️⃣ Extract Addresses
+                </button>
+                <button id="btnGeocode" class="btn btn-primary" disabled>
+                    2️⃣ Generate Route
+                </button>
             </div>
+            <div id="addressCount" class="badge">0 addresses</div>
         </div>
-
-        <div id="resultsSection" class="hidden">
-            <div class="card">
-                <h2 id="resultsTitle"></h2>
-                <div id="routesList"></div>
+        
+        <div class="card">
+            <h3>📋 Activity Log</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+    
+    <div id="processingStatus" class="card hidden">
+        <div style="text-align: center;">
+            <div id="statusMessage">Processing...</div>
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
             </div>
         </div>
     </div>
+</div>
 
-    <div id="apiKeyModal" class="modal">
-        <div class="modal-content">
-            <h3 style="font-size: 20px; margin-bottom: 12px;">🔑 Anthropic API Key</h3>
-            <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px;">
-                Get your free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
-            </p>
-            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
-            <button class="btn btn-primary" onclick="saveApiKey()">Save Key</button>
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-        </div>
-    </div>
-
-    <script>
-        'use strict';
-        
-        let images = [];
-        let apiKey = localStorage.getItem('anthropic_api_key') || '';
-        let isProcessing = false;
-
-        // SIMPLIFIED PROMPT - Direct and Clear
-        const SIMPLE_PROMPT = `Look at this UK delivery run sheet image.
-
-Extract ALL delivery addresses. For EACH delivery:
-
-1. Find the stop number
-2. Find the FULL address (include everything: building, street, area, postcode)
-3. Remove person names (keep business names)
-4. Remove metadata like "Del Weight:", "Signature:", "Contact:", "Remarks:"
-
-UK Postcodes look like: HA6 2WQ, HA5 3PB, NW1 8XE, NW5 2NL
-
-Return ONLY this JSON format (NO markdown, NO explanation):
-
-[
-  {"num": 9, "address": "10 Cullera Close, Northwood, Middlesex HA6 3SE GB"},
-  {"num": 10, "address": "15 Asteria Place, Eastbury Avenue, Northwood, Middlesex HA6 3FL GB"}
-]
-
-Extract ALL stops you can see. Include " GB" at the end of each address.`;
-
-        // UK POSTCODE REGEX
-        const UK_POSTCODE_REGEX = /\b([A-Z]{1,2}\d{1,2}[A-Z]?)\s*(\d[A-Z]{2})\b/gi;
-        
-        function isValidUKPostcode(postcode) {
-            if (!postcode) return false;
-            return /^[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2}$/i.test(postcode.trim());
+<script>
+    // Configure PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    
+    // State management
+    const state = {
+        files: [],
+        fileTexts: new Map(),
+        processing: false,
+        currentTab: 'contacts'
+    };
+    
+    // DOM elements
+    const els = {
+        fileInput: document.getElementById('fileInput'),
+        fileList: document.getElementById('fileList'),
+        dropZone: document.getElementById('dropZone'),
+        btnExtractContacts: document.getElementById('btnExtractContacts'),
+        btnExtractAddresses: document.getElementById('btnExtractAddresses'),
+        btnGeocode: document.getElementById('btnGeocode'),
+        addresses: document.getElementById('addresses'),
+        addressCount: document.getElementById('addressCount'),
+        log: document.getElementById('log'),
+        processingStatus: document.getElementById('processingStatus'),
+        statusMessage: document.getElementById('statusMessage'),
+        progressBar: document.getElementById('progressBar')
+    };
+    
+    // Logger
+    class Logger {
+        static log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            els.log.appendChild(entry);
+            els.log.scrollTop = els.log.scrollHeight;
         }
-
-        // NAME REMOVAL
-        function removeName(address) {
-            // Remove "Mr/Mrs/Ms/Miss/Dr + Name"
-            address = address.replace(/\b(Mr|Mrs|Ms|Miss|Dr|Prof)\.?\s+[A-Z][a-z]+\s+[A-Z][a-z]+,?\s*/gi, '');
-            // Remove "FIRSTNAME LASTNAME,"
-            address = address.replace(/^[A-Z][a-z]+\s+[A-Z][a-z]+,?\s*/, '');
-            // Remove "ALL CAPS NAME,"
-            address = address.replace(/^[A-Z\s]+,\s*/, '');
-            return address.trim();
+        static success(msg) { this.log(msg, 'success'); }
+        static error(msg) { this.log(msg, 'error'); }
+        static warning(msg) { this.log(msg, 'warning'); }
+        static info(msg) { this.log(msg, 'info'); }
+    }
+    
+    // OCR Processing
+    async function performOCR(file) {
+        try {
+            Logger.info(`Starting OCR for ${file.name}...`);
+            const worker = await Tesseract.createWorker('eng');
+            const { data: { text } } = await worker.recognize(file);
+            await worker.terminate();
+            Logger.success(`OCR completed for ${file.name}`);
+            return text;
+        } catch (error) {
+            Logger.error(`OCR failed for ${file.name}: ${error.message}`);
+            throw error;
         }
-
-        // CLEANUP
-        function cleanAddress(address) {
-            if (!address) return '';
+    }
+    
+    // PDF Processing
+    async function extractTextFromPDF(file) {
+        try {
+            Logger.info(`Extracting text from PDF: ${file.name}`);
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
             
-            // Remove names
-            address = removeName(address);
-            
-            // Remove metadata keywords
-            const keywords = ['Del Weight:', 'Del Items:', 'Deadline:', 'Signature:', 'Contact Nos:', 'Ref:', 'Remarks:'];
-            keywords.forEach(kw => {
-                const regex = new RegExp(kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\s*[^,]*', 'gi');
-                address = address.replace(regex, '');
-            });
-            
-            // Remove stop number prefix
-            address = address.replace(/^\d+\.\s*\|?\s*/, '');
-            
-            // Clean whitespace
-            address = address.replace(/\s+/g, ' ');
-            address = address.replace(/,\s*,+/g, ',');
-            address = address.replace(/^\s*,+|,+\s*$/g, '');
-            address = address.trim();
-            
-            // Ensure GB suffix
-            if (!address.toUpperCase().endsWith(' GB')) {
-                address += ' GB';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join('\n');
+                fullText += pageText + '\n';
             }
             
-            return address;
+            Logger.success(`PDF text extracted: ${file.name}`);
+            return fullText;
+        } catch (error) {
+            Logger.error(`PDF extraction failed: ${error.message}`);
+            throw error;
         }
-
-        // DEBUG LOG
-        function debugLog(message) {
-            const panel = document.getElementById('debugPanel');
-            panel.classList.remove('hidden');
-            panel.textContent += `\n${message}`;
-            panel.scrollTop = panel.scrollHeight;
-        }
-
-        // CLAUDE VISION
-        async function processWithClaude(base64, mediaType, filename) {
-            debugLog(`\n📸 Processing: ${filename}`);
+    }
+    
+    // Process all files
+    async function processAllFiles() {
+        state.fileTexts.clear();
+        els.processingStatus.classList.remove('hidden');
+        
+        for (let i = 0; i < state.files.length; i++) {
+            const file = state.files[i];
+            const progress = ((i + 1) / state.files.length) * 100;
+            els.progressBar.style.width = progress + '%';
+            els.statusMessage.textContent = `Processing ${file.name}...`;
             
             try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': apiKey,
-                        'anthropic-version': '2023-06-01'
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 4000,
-                        temperature: 0,
-                        messages: [{
-                            role: 'user',
-                            content: [
-                                {
-                                    type: 'image',
-                                    source: { type: 'base64', media_type: mediaType, data: base64 }
-                                },
-                                {
-                                    type: 'text',
-                                    text: SIMPLE_PROMPT
-                                }
-                            ]
-                        }]
-                    })
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || `API error: ${response.status}`);
+                let text = '';
+                if (file.type === 'application/pdf') {
+                    text = await extractTextFromPDF(file);
+                } else if (file.type.startsWith('image/')) {
+                    text = await performOCR(file);
                 }
-
-                const data = await response.json();
-                const text = data.content[0].text;
-                
-                debugLog(`✅ Response received (${text.length} chars)`);
-                debugLog(`📄 Raw response:\n${text.substring(0, 500)}...`);
-                
-                return text;
-                
+                state.fileTexts.set(file.name, text);
             } catch (error) {
-                debugLog(`❌ Error: ${error.message}`);
-                throw error;
+                console.error(`Failed to process ${file.name}:`, error);
             }
         }
-
-        // PARSE RESPONSE
-        function parseResponse(text) {
-            debugLog('\n🔍 Parsing response...');
+        
+        els.processingStatus.classList.add('hidden');
+    }
+    
+    // Extract contacts from text
+    function extractConsignments(text) {
+        const results = [];
+        const consignmentRegex = /(\d{1,3})\s+(\d{7})\b/g;
+        const matches = [...text.matchAll(consignmentRegex)];
+        
+        for (let i = 0; i < matches.length; i++) {
+            const stopNumber = matches[i][1];
+            const consignmentId = matches[i][2];
+            const startIdx = matches[i].index;
+            const endIdx = (i + 1 < matches.length) ? matches[i + 1].index : text.length;
+            const block = text.substring(startIdx, endIdx);
             
-            // Remove markdown
-            text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+            // Extract contact from block
+            const contactMatch = block.match(/Contact\s+Nos?:\s*([^\n]+)/i);
+            const contact = contactMatch ? contactMatch[1].trim() : "No contact available";
             
-            // Find JSON array
-            const jsonMatch = text.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) {
-                debugLog('❌ No JSON array found');
-                throw new Error('No JSON found in response');
-            }
-            
-            try {
-                const stops = JSON.parse(jsonMatch[0]);
-                debugLog(`✅ Parsed ${stops.length} stops`);
-                return stops;
-            } catch (e) {
-                debugLog(`❌ JSON parse error: ${e.message}`);
-                throw new Error('Invalid JSON');
-            }
-        }
-
-        // VALIDATE
-        function validateStops(stops) {
-            debugLog(`\n🔧 Validating ${stops.length} stops...`);
-            
-            const valid = [];
-            
-            stops.forEach(stop => {
-                if (!stop.num || !stop.address) {
-                    debugLog(`⚠️ Skip: missing num/address`);
-                    return;
-                }
-                
-                let address = cleanAddress(stop.address);
-                
-                // Check for UK postcode
-                const hasPostcode = UK_POSTCODE_REGEX.test(address);
-                if (!hasPostcode) {
-                    debugLog(`⚠️ Skip stop ${stop.num}: no UK postcode`);
-                    return;
-                }
-                
-                valid.push({
-                    num: parseInt(stop.num),
-                    address: address
-                });
-                
-                debugLog(`✅ Valid: ${stop.num}`);
-            });
-            
-            debugLog(`✅ ${valid.length} valid stops`);
-            return valid;
-        }
-
-        // FILE TO BASE64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    try {
-                        resolve(reader.result.split(',')[1]);
-                    } catch (e) {
-                        reject(new Error('Failed to encode'));
-                    }
-                };
-                reader.onerror = () => reject(new Error('Failed to read file'));
-                reader.readAsDataURL(file);
+            results.push({
+                stop: parseInt(stopNumber),
+                id: consignmentId,
+                contact: contact
             });
         }
-
-        // MAIN PROCESS
-        async function processImages() {
-            if (images.length === 0) {
-                showError('Please upload at least one image');
-                return;
-            }
-
-            if (!apiKey || !apiKey.startsWith('sk-ant-')) {
-                showError('Please add a valid API key first');
-                showApiKeyModal();
-                return;
-            }
-
-            isProcessing = true;
-            updateProcessButton();
-            
-            document.getElementById('errorSection').classList.add('hidden');
-            document.getElementById('resultsSection').classList.add('hidden');
-            document.getElementById('progressSection').classList.remove('hidden');
-            document.getElementById('debugPanel').textContent = '🚀 Starting processing...';
-            
-            const allStops = [];
-            let failed = 0;
-
-            try {
-                for (let i = 0; i < images.length; i++) {
-                    const progress = ((i + 1) / images.length) * 100;
-                    document.getElementById('progressBar').style.width = progress + '%';
-                    document.getElementById('progressText').textContent = 
-                        `Processing ${i + 1}/${images.length}: ${images[i].name}`;
-
-                    try {
-                        const base64 = await fileToBase64(images[i]);
-                        const response = await processWithClaude(base64, images[i].type, images[i].name);
-                        const parsed = parseResponse(response);
-                        const valid = validateStops(parsed);
-                        
-                        if (valid.length > 0) {
-                            allStops.push(...valid);
-                            debugLog(`\n✅ Image ${i + 1}: ${valid.length} addresses extracted`);
-                        } else {
-                            failed++;
-                            debugLog(`\n⚠️ Image ${i + 1}: No valid addresses`);
-                        }
-                        
-                    } catch (err) {
-                        failed++;
-                        debugLog(`\n❌ Image ${i + 1} failed: ${err.message}`);
-                        
-                        if (err.message.includes('authentication') || err.message.includes('API key')) {
-                            throw err;
-                        }
-                    }
-                    
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-
-                if (allStops.length === 0) {
-                    throw new Error('No addresses extracted from any image. Check debug panel for details.');
-                }
-
-                // Deduplicate and sort
-                const unique = allStops
-                    .filter((s, i, self) => i === self.findIndex(x => x.num === s.num && x.address === s.address))
-                    .sort((a, b) => a.num - b.num);
-
-                debugLog(`\n✅ TOTAL: ${unique.length} unique addresses`);
-
-                // Group into routes
-                const groups = [];
-                const maxPer = 14;
+        
+        return results;
+    }
+    
+    // Extract addresses
+    function extractAddresses(text) {
+        const addresses = [];
+        const lines = text.split('\n');
+        
+        for (let line of lines) {
+            // Look for lines that look like addresses (contain postcodes)
+            if (/[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2}/i.test(line)) {
+                // Clean up the line
+                let address = line.trim();
+                // Remove common prefixes
+                address = address.replace(/^\d+\s*[\.\)]\s*/, '');
+                // Remove metadata
+                address = address.replace(/Del Weight:.*$/i, '');
+                address = address.replace(/Contact Nos:.*$/i, '');
                 
-                for (let i = 0; i < unique.length; i += maxPer) {
-                    const group = unique.slice(i, Math.min(i + maxPer, unique.length));
-                    const dests = group.map(s => encodeURIComponent(s.address)).join('&daddr=');
-                    groups.push({
-                        id: Math.floor(i / maxPer) + 1,
-                        startStop: group[0].num,
-                        endStop: group[group.length - 1].num,
-                        count: group.length,
-                        stops: group,
-                        link: `https://maps.apple.com/?daddr=${dests}`
-                    });
+                if (address.length > 10) {
+                    addresses.push(address.trim());
                 }
-
-                displayResults(groups, unique.length);
-
-            } catch (err) {
-                debugLog(`\n❌ FATAL: ${err.message}`);
-                showError(err.message);
-            } finally {
-                isProcessing = false;
-                document.getElementById('progressSection').classList.add('hidden');
-                updateProcessButton();
             }
         }
-
-        // UI FUNCTIONS
-        function updateApiKeyStatus() {
-            const statusDiv = document.getElementById('apiKeyStatus');
-            if (apiKey && apiKey.startsWith('sk-ant-')) {
-                statusDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <span>✓</span>
-                        <span>API Key configured</span>
-                        <button onclick="showApiKeyModal()" 
-                                style="background: var(--success); color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; margin-left: auto; font-size: 12px; font-weight: 600;">
-                            Change
-                        </button>
-                    </div>
-                `;
+        
+        return addresses;
+    }
+    
+    // Event handlers
+    async function handleExtractContacts() {
+        if (state.files.length === 0) return;
+        
+        state.processing = true;
+        updateUI();
+        
+        await processAllFiles();
+        
+        let totalCons = 0;
+        let totalContacts = 0;
+        let totalSkipped = 0;
+        const allResults = [];
+        
+        for (const [filename, text] of state.fileTexts) {
+            const consignments = extractConsignments(text);
+            totalCons += consignments.length;
+            
+            for (const cons of consignments) {
+                if (cons.contact === "No contact available") {
+                    totalSkipped++;
+                } else {
+                    totalContacts++;
+                }
+                allResults.push(`Stop ${cons.stop}: ${cons.id} - Contact: ${cons.contact}`);
+            }
+        }
+        
+        // Update KPIs
+        document.getElementById('kpiCons').textContent = totalCons;
+        document.getElementById('kpiContacts').textContent = totalContacts;
+        document.getElementById('kpiSkipped').textContent = totalSkipped;
+        const successRate = totalCons > 0 ? Math.round((totalContacts / totalCons) * 100) : 0;
+        document.getElementById('kpiPercent').textContent = `${successRate}%`;
+        
+        // Show preview
+        const preview = document.getElementById('contactPreview');
+        const status = document.getElementById('contactStatus');
+        
+        if (allResults.length > 0) {
+            status.classList.remove('hidden');
+            status.textContent = `✓ Found ${totalCons} consignments`;
+            
+            preview.classList.remove('hidden');
+            preview.textContent = allResults.slice(0, 20).join('\n');
+            if (allResults.length > 20) {
+                preview.textContent += `\n... and ${allResults.length - 20} more`;
+            }
+        } else {
+            status.classList.remove('hidden');
+            status.textContent = '⚠️ No consignments found';
+        }
+        
+        state.processing = false;
+        updateUI();
+    }
+    
+    async function handleExtractAddresses() {
+        if (state.files.length === 0) return;
+        
+        state.processing = true;
+        updateUI();
+        Logger.info('Starting address extraction...');
+        
+        await processAllFiles();
+        
+        const allAddresses = [];
+        
+        for (const [filename, text] of state.fileTexts) {
+            Logger.info(`Processing ${filename}...`);
+            const addresses = extractAddresses(text);
+            if (addresses.length > 0) {
+                allAddresses.push(...addresses);
+                Logger.success(`Found ${addresses.length} addresses in ${filename}`);
             } else {
-                statusDiv.innerHTML = `
-                    <div class="alert alert-warning">
-                        <span>⚠️</span>
-                        <span>API Key required</span>
-                        <button onclick="showApiKeyModal()" 
-                                style="background: var(--warning); color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; margin-left: auto; font-weight: 600;">
-                            Add Key
-                        </button>
-                    </div>
-                `;
+                Logger.warning(`No addresses found in ${filename}`);
             }
-            updateProcessButton();
         }
-
-        function updateImageList() {
-            const listDiv = document.getElementById('imageList');
-            if (images.length === 0) {
-                listDiv.innerHTML = '';
-                return;
-            }
-            const header = document.createElement('div');
-            header.style.cssText = 'color: var(--success); font-size: 14px; margin-bottom: 12px; font-weight: 600;';
-            header.textContent = `✓ ${images.length} file(s) selected`;
-            listDiv.innerHTML = '';
-            listDiv.appendChild(header);
+        
+        // Remove duplicates
+        const uniqueAddresses = [...new Set(allAddresses)];
+        
+        els.addresses.value = uniqueAddresses.join('\n');
+        els.addressCount.textContent = `${uniqueAddresses.length} addresses`;
+        els.addressCount.className = uniqueAddresses.length > 0 ? 'badge success' : 'badge';
+        
+        if (uniqueAddresses.length > 0) {
+            Logger.success(`Total: ${uniqueAddresses.length} unique addresses extracted`);
             
-            images.forEach((img, idx) => {
-                const item = document.createElement('div');
-                item.className = 'image-item';
-                item.innerHTML = `
-                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${img.name}</span>
-                    <span style="font-size: 11px; color: var(--gray-600); margin-right: 12px;">${formatFileSize(img.size)}</span>
-                    <button class="remove-btn" onclick="removeImage(${idx})">Remove</button>
-                `;
-                listDiv.appendChild(item);
+            // Automatically generate route links
+            generateRouteLinks(uniqueAddresses);
+        } else {
+            Logger.error('No addresses found in uploaded files');
+        }
+        
+        state.processing = false;
+        updateUI();
+    }
+    
+    // Generate Apple Maps route links
+    function generateRouteLinks(addresses) {
+        const maxStopsPerRoute = 14; // Apple Maps limitation
+        const routeGroups = [];
+        
+        // Group addresses into routes
+        for (let i = 0; i < addresses.length; i += maxStopsPerRoute) {
+            const group = addresses.slice(i, Math.min(i + maxStopsPerRoute, addresses.length));
+            const destinations = group.map(addr => encodeURIComponent(addr)).join('&daddr=');
+            
+            routeGroups.push({
+                id: Math.floor(i / maxStopsPerRoute) + 1,
+                startStop: i + 1,
+                endStop: Math.min(i + maxStopsPerRoute, addresses.length),
+                count: group.length,
+                addresses: group,
+                link: `https://maps.apple.com/?daddr=${destinations}`
             });
         }
-
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        
+        // Display route links
+        displayRouteLinks(routeGroups, addresses.length);
+    }
+    
+    // Display generated route links
+    function displayRouteLinks(groups, totalAddresses) {
+        // Create or update routes display
+        let routesContainer = document.getElementById('routesContainer');
+        if (!routesContainer) {
+            const gpxTab = document.getElementById('gpx-tab');
+            const routesCard = document.createElement('div');
+            routesCard.className = 'card';
+            routesCard.innerHTML = `
+                <h3>🗺️ Generated Routes</h3>
+                <div id="routesContainer"></div>
+            `;
+            gpxTab.insertBefore(routesCard, gpxTab.children[1]);
+            routesContainer = document.getElementById('routesContainer');
         }
-
-        function removeImage(idx) {
-            images.splice(idx, 1);
-            updateImageList();
-            updateProcessButton();
-        }
-
-        function updateProcessButton() {
-            const btn = document.getElementById('processBtn');
-            btn.disabled = !(images.length > 0 && apiKey && apiKey.startsWith('sk-ant-') && !isProcessing);
-        }
-
-        function showApiKeyModal() {
-            document.getElementById('apiKeyModal').style.display = 'flex';
-            document.getElementById('apiKeyInput').value = apiKey;
-        }
-
-        function closeModal() {
-            document.getElementById('apiKeyModal').style.display = 'none';
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key.startsWith('sk-ant-')) {
-                showError('Invalid API key. Must start with "sk-ant-"');
-                return;
-            }
-            apiKey = key;
-            localStorage.setItem('anthropic_api_key', key);
-            updateApiKeyStatus();
-            closeModal();
-            showSuccess('✓ API key saved');
-        }
-
-        function displayResults(groups, total) {
-            document.getElementById('resultsTitle').textContent = `✓ ${total} Addresses Extracted`;
-            const list = document.getElementById('routesList');
-            list.innerHTML = '';
-
-            groups.forEach(g => {
-                const card = document.createElement('div');
-                card.className = 'route-card';
-                card.innerHTML = `
-                    <div class="route-header">
-                        <div>
-                            <div style="font-weight: 600; font-size: 18px;">Route ${g.id}</div>
-                            <div style="color: var(--gray-600); font-size: 13px;">Stops ${g.startStop}-${g.endStop}</div>
-                        </div>
-                        <div class="badge">${g.count} stops</div>
-                    </div>
-                    <a href="${g.link}" target="_blank" class="btn btn-primary" style="text-decoration: none;">
+        
+        routesContainer.innerHTML = `
+            <div class="alert-info" style="margin-bottom: 15px;">
+                ✓ ${totalAddresses} addresses extracted and grouped into ${groups.length} route(s)
+            </div>
+        `;
+        
+        groups.forEach(group => {
+            const routeDiv = document.createElement('div');
+            routeDiv.style.cssText = 'margin-bottom: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px;';
+            routeDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong>Route ${group.id}</strong>
+                    <span class="badge success">${group.count} stops (${group.startStop}-${group.endStop})</span>
+                </div>
+                <div class="btn-group">
+                    <a href="${group.link}" target="_blank" class="btn btn-primary" style="text-decoration: none;">
                         🗺️ Open in Apple Maps
                     </a>
-                    <button class="btn btn-secondary" onclick="copyLink('${g.link.replace(/'/g, "\\'")}')">
+                    <button class="btn btn-secondary" onclick="copyRouteLink('${group.link.replace(/'/g, "\\'")}')">
                         📋 Copy Link
                     </button>
-                    <div class="show-addresses" onclick="toggleAddresses(this)">▼ Show ${g.count} addresses</div>
-                    <div class="address-list">
-                        ${g.stops.map(s => `
-                            <div class="address-item">
-                                <strong style="color: var(--primary);">${s.num}.</strong> ${s.address}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                list.appendChild(card);
-            });
-
-            document.getElementById('resultsSection').classList.remove('hidden');
-        }
-
-        function toggleAddresses(el) {
-            const list = el.nextElementSibling;
-            if (list.style.display === 'block') {
-                list.style.display = 'none';
-                el.textContent = el.textContent.replace('▲', '▼');
-            } else {
-                list.style.display = 'block';
-                el.textContent = el.textContent.replace('▼', '▲');
-            }
-        }
-
-        function copyLink(link) {
-            navigator.clipboard.writeText(link)
-                .then(() => showSuccess('✓ Link copied'))
-                .catch(() => showError('Failed to copy'));
-        }
-
-        function showError(message) {
-            const errorSection = document.getElementById('errorSection');
-            document.getElementById('errorText').textContent = message;
-            errorSection.classList.remove('hidden');
-        }
-
-        function showSuccess(message) {
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-success';
-            alert.innerHTML = `<span>✓</span><span>${message}</span>`;
-            alert.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 3000);
-        }
-
-        // EVENT LISTENERS
-        document.addEventListener('DOMContentLoaded', () => {
-            updateApiKeyStatus();
-            
-            document.getElementById('imageInput').addEventListener('change', (e) => {
-                images = Array.from(e.target.files).filter(f => 
-                    (f.type.startsWith('image/') || f.type === 'application/pdf') && f.size <= 10485760
-                );
-                updateImageList();
-                updateProcessButton();
-            });
-            
-            document.getElementById('processBtn').addEventListener('click', processImages);
-            
-            document.getElementById('apiKeyModal').addEventListener('click', (e) => {
-                if (e.target.id === 'apiKeyModal') closeModal();
-            });
+                    <button class="btn btn-secondary" onclick="showRouteAddresses(${group.id})">
+                        📍 Show Addresses
+                    </button>
+                </div>
+                <div id="route-addresses-${group.id}" style="display: none; margin-top: 10px; padding: 10px; background: white; border-radius: 5px; font-size: 12px;">
+                    ${group.addresses.map((addr, idx) => `
+                        <div style="margin-bottom: 5px;">
+                            <strong>${group.startStop + idx}.</strong> ${addr}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            routesContainer.appendChild(routeDiv);
         });
-    </script>
+        
+        Logger.success(`Generated ${groups.length} route link(s) for Apple Maps`);
+    }
+    
+    // Helper function to copy route link
+    function copyRouteLink(link) {
+        navigator.clipboard.writeText(link)
+            .then(() => {
+                const toast = document.createElement('div');
+                toast.className = 'alert-info';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+                toast.textContent = '✓ Route link copied to clipboard!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            })
+            .catch(() => alert('Failed to copy link'));
+    }
+    
+    // Helper function to toggle route addresses display
+    function showRouteAddresses(routeId) {
+        const addressDiv = document.getElementById(`route-addresses-${routeId}`);
+        if (addressDiv) {
+            addressDiv.style.display = addressDiv.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+    
+    // UI update functions
+    function updateFileList() {
+        if (state.files.length === 0) {
+            els.fileList.textContent = 'No files selected';
+        } else {
+            els.fileList.innerHTML = state.files.map(f => 
+                `• ${f.name} (${(f.size/1024).toFixed(1)} KB)`
+            ).join('<br>');
+        }
+        updateUI();
+    }
+    
+    function updateUI() {
+        const hasFiles = state.files.length > 0;
+        els.btnExtractContacts.disabled = !hasFiles || state.processing;
+        els.btnExtractAddresses.disabled = !hasFiles || state.processing;
+        
+        const hasAddresses = els.addresses.value.trim().length > 0;
+        els.btnGeocode.disabled = !hasAddresses || state.processing;
+    }
+    
+    // Event listeners
+    els.fileInput.addEventListener('change', (e) => {
+        state.files = Array.from(e.target.files);
+        updateFileList();
+    });
+    
+    els.dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        els.dropZone.style.borderColor = 'var(--accent)';
+    });
+    
+    els.dropZone.addEventListener('dragleave', () => {
+        els.dropZone.style.borderColor = 'var(--border)';
+    });
+    
+    els.dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        els.dropZone.style.borderColor = 'var(--border)';
+        state.files = Array.from(e.dataTransfer.files);
+        updateFileList();
+    });
+    
+    document.getElementById('btnSortFiles').addEventListener('click', () => {
+        state.files.sort((a, b) => a.name.localeCompare(b.name));
+        updateFileList();
+        Logger.info('Files sorted by name');
+    });
+    
+    document.getElementById('btnClearFiles').addEventListener('click', () => {
+        state.files = [];
+        state.fileTexts.clear();
+        els.fileInput.value = '';
+        updateFileList();
+        Logger.info('All files cleared');
+    });
+    
+    els.btnExtractContacts.addEventListener('click', handleExtractContacts);
+    els.btnExtractAddresses.addEventListener('click', handleExtractAddresses);
+    
+    els.btnGeocode.addEventListener('click', () => {
+        Logger.info('Route generation would require a backend server for geocoding');
+        alert('Route generation requires a backend server to handle geocoding API calls securely.');
+    });
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            tab.classList.add('active');
+            const tabId = tab.dataset.tab;
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            state.currentTab = tabId;
+        });
+    });
+    
+    // Initialize
+    updateUI();
+    console.log('Runsheet Processor initialized');
+</script>
+```
+
 </body>
 </html>
