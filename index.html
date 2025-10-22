@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>🧠 Ultra Robust Route Generator v3.3 (Fixed)</title>
+  <title>🧠 Ultra Robust Route Generator v3.4 (CDN Diagnostics)</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
@@ -14,1190 +15,354 @@
     .card{background:#fff;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
     h1{font-size:28px;margin-bottom:8px;color:var(--gray-900);font-weight:700}
     h2{font-size:20px;margin-bottom:16px;color:var(--gray-800);font-weight:600}
-    h3{font-size:18px;margin-bottom:12px;color:var(--gray-800)}
-    .subtitle{color:var(--gray-600);font-size:14px;margin-bottom:16px}
-    .version-badge{display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-left:8px}
-    .btn{padding:14px 20px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-    .btn:disabled{background:var(--gray-300);cursor:not-allowed;opacity:.6}
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-primary:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px)}
-    .btn-secondary{background:var(--gray-200);color:var(--gray-800)}
-    input[type="file"]{width:100%;padding:12px;border:2px dashed var(--gray-300);border-radius:8px;margin-bottom:12px;cursor:pointer;background:var(--gray-50)}
-    .checkbox-group{display:flex;align-items:center;gap:8px;margin:12px 0;padding:12px;background:var(--gray-50);border-radius:8px}
-    .checkbox-group input[type="checkbox"]{width:18px;height:18px;cursor:pointer}
-    .checkbox-group label{font-size:14px;cursor:pointer;user-select:none}
-    .alert{padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:14px;display:flex;align-items:center;gap:8px}
+    .alert{padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:14px}
     .alert-warning{background:#fef5e7;border-left:4px solid var(--warning);color:#875a0f}
     .alert-error{background:#fee;border-left:4px solid var(--error);color:#742a2a}
     .alert-success{background:#e6fffa;border-left:4px solid var(--success);color:#234e52}
     .alert-info{background:#ebf8ff;border-left:4px solid var(--primary);color:#2c5282}
-    .progress{width:100%;height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden;margin:16px 0}
-    .progress-bar{height:100%;background:linear-gradient(90deg,var(--primary) 0%,var(--secondary) 100%);transition:width .3s ease}
-    .processing-stage{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:6px;margin-bottom:8px;font-size:13px}
-    .processing-stage .icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:14px}
-    .processing-stage.pending .icon{background:var(--gray-300);color:var(--gray-600)}
-    .processing-stage.processing .icon{background:var(--primary);color:#fff;animation:pulse 1.5s ease-in-out infinite}
-    .processing-stage.complete .icon{background:var(--success);color:#fff}
-    .processing-stage.error .icon{background:var(--error);color:#fff}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-    .image-list{max-height:300px;overflow-y:auto;margin-top:12px}
-    .image-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--gray-50);border-radius:6px;margin-bottom:8px;font-size:13px}
-    .remove-btn{color:var(--error);cursor:pointer;font-weight:600;padding:4px 8px;border-radius:4px}
-    .route-card{border:1px solid var(--gray-200);border-radius:12px;padding:20px;margin-bottom:16px}
-    .route-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .badge{background:#ebf8ff;color:#2c5282;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700}
-    .address-list{max-height:300px;overflow-y:auto;background:var(--gray-50);padding:16px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
-    .address-item{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gray-200)}
-    .address-item .stop-num{color:var(--primary);font-weight:700;margin-right:8px}
-    .show-addresses{cursor:pointer;color:var(--primary);font-size:14px;margin-top:12px;user-select:none}
-    .hidden{display:none!important}
-    .debug-panel{background:#1a202c;color:#48bb78;padding:16px;border-radius:8px;font-family:Monaco,monospace;font-size:11px;max-height:300px;overflow-y:auto;margin-top:16px}
-    .debug-panel pre{white-space:pre-wrap;word-break:break-all}
-    .debug-panel .error{color:#fc8181}
-    .debug-panel .warning{color:#f6ad55}
-    .debug-panel .info{color:#63b3ed}
-    .preview-canvas{max-width:100%;border:1px solid var(--gray-300);border-radius:8px;margin-top:12px}
-    .feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
-    .feature-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--gray-50);border-radius:6px;font-size:13px}
-    .feature-item .icon{font-size:18px}
-    .extracted-addresses{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin-top:16px}
-    .extracted-addresses h4{color:#166534;margin-bottom:12px}
-    .address-editor{width:100%;min-height:200px;padding:12px;border:1px solid var(--gray-300);border-radius:6px;font-family:monospace;font-size:13px;margin:12px 0;resize:vertical}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
-    .stat-card{background:var(--gray-50);padding:12px;border-radius:8px;text-align:center}
-    .stat-value{font-size:24px;font-weight:700;color:var(--primary)}
-    .stat-label{font-size:12px;color:var(--gray-600);margin-top:4px}
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .btn{padding:14px 20px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease;margin-right:10px;margin-bottom:10px}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-success{background:var(--success);color:#fff}
+    .diagnostic-result{background:var(--gray-50);padding:16px;border-radius:8px;margin:12px 0;font-family:monospace;font-size:13px}
+    .status-indicator{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px}
+    .status-pass{background:var(--success)}
+    .status-fail{background:var(--error)}
+    .status-pending{background:var(--warning)}
+    pre{background:#1a202c;color:#48bb78;padding:16px;border-radius:8px;overflow-x:auto;font-size:12px}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>🧠 Ultra Robust Route Generator <span class="version-badge">v3.3 FIXED</span></h1>
-      <div class="subtitle">Client-side OCR (Tesseract.js) + multi-layer UK address normalisation with enhanced error handling</div>
-      <div class="feature-list">
-        <div class="feature-item"><span class="icon">🖼️</span><span>Advanced Image Pre-Processing</span></div>
-        <div class="feature-item"><span class="icon">🔎</span><span>OCR (Tesseract.js)</span></div>
-        <div class="feature-item"><span class="icon">🎯</span><span>7-Layer Parsing System</span></div>
-        <div class="feature-item"><span class="icon">✅</span><span>UK Postcode Validation</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📸 Upload Run Sheet Images</h2>
-      <input type="file" id="imageInput" multiple accept="image/*" />
-      <div class="checkbox-group">
-        <input type="checkbox" id="enablePreprocessing" checked />
-        <label for="enablePreprocessing">
-          <strong>Enable Advanced Image Pre-Processing</strong>
-          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Contrast enhancement, noise reduction, sharpening, OCR optimisation</div>
-        </label>
-      </div>
-      <div class="checkbox-group">
-        <input type="checkbox" id="enableManualEdit" checked />
-        <label for="enableManualEdit">
-          <strong>Allow Manual Address Editing</strong>
-          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Edit addresses before generating routes</div>
-        </label>
-      </div>
-      <div class="checkbox-group">
-        <input type="checkbox" id="enableDebug" checked />
-        <label for="enableDebug">
-          <strong>Show Debug Information</strong>
-          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Display all processing stages and OCR logs (recommended for troubleshooting)</div>
-        </label>
+      <h1>🔧 OCR Diagnostic Tool</h1>
+      <div class="alert alert-info">
+        This diagnostic tool will help identify why Tesseract.js is failing to load. Run the tests below to troubleshoot.
       </div>
 
-      <div id="imageList" class="image-list"></div>
-      <canvas id="previewCanvas" class="preview-canvas hidden"></canvas>
-    </div>
+```
+  <h2>Quick Diagnostics</h2>
+  <button onclick="runAllDiagnostics()" class="btn btn-primary">🔍 Run All Diagnostics</button>
+  <button onclick="testCDN()" class="btn btn-primary">Test CDN Access</button>
+  <button onclick="testWorkerSupport()" class="btn btn-primary">Test Web Worker Support</button>
+  <button onclick="testTesseractLoad()" class="btn btn-primary">Test Tesseract Load</button>
+  
+  <div id="diagnosticResults" style="margin-top:20px"></div>
+</div>
 
-    <div style="display:flex;gap:10px;margin-bottom:16px">
-      <button id="processBtn" class="btn btn-primary" disabled>🧠 Process with Ultra Robust AI (7 Layers)</button>
-      <button id="cancelBtn" class="btn btn-secondary" disabled>✖ Cancel</button>
-    </div>
+<div class="card">
+  <h2>Recommended Solutions</h2>
+  <div id="recommendations"></div>
+</div>
 
-    <div id="progressSection" class="hidden">
-      <div class="card">
-        <h2>Processing Pipeline</h2>
-        <div id="processingStages"></div>
-        <div id="progressText" style="text-align:center;margin:16px 0;font-size:14px;font-weight:500"></div>
-        <div class="progress"><div id="progressBar" class="progress-bar" style="width:0%"></div></div>
-        <div id="debugPanel" class="debug-panel hidden"></div>
-      </div>
-    </div>
+<div class="card">
+  <h2>Manual Test (No OCR)</h2>
+  <p style="margin-bottom:12px;color:var(--gray-600)">Test address parsing without OCR to verify core functionality:</p>
+  <textarea id="manualInput" style="width:100%;min-height:150px;padding:12px;border:1px solid var(--gray-300);border-radius:6px;font-family:monospace;font-size:13px" placeholder="Paste addresses here (UK postcodes required)..."></textarea>
+  <button onclick="testManualParsing()" class="btn btn-success" style="margin-top:12px">Test Address Parsing</button>
+  <div id="manualResults"></div>
+</div>
 
-    <div id="extractedSection" class="hidden">
-      <div class="card">
-        <h2>📍 Extracted Addresses</h2>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-value" id="totalExtracted">0</div><div class="stat-label">Total Extracted</div></div>
-          <div class="stat-card"><div class="stat-value" id="validAddresses">0</div><div class="stat-label">Valid Addresses</div></div>
-          <div class="stat-card"><div class="stat-value" id="invalidAddresses">0</div><div class="stat-label">Invalid/Skipped</div></div>
-        </div>
-        <div class="extracted-addresses">
-          <h4>Edit addresses below if needed (one per line):</h4>
-          <textarea id="addressEditor" class="address-editor"></textarea>
-          <div class="btn-group" style="display:flex;gap:10px">
-            <button class="btn btn-primary" onclick="generateRoutes()">✅ Generate Routes</button>
-            <button class="btn btn-secondary" onclick="reprocessImages()">🔄 Reprocess Images</button>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="card">
+  <h2>Environment Information</h2>
+  <pre id="envInfo">Loading...</pre>
+</div>
+```
 
-    <div id="errorSection" class="hidden">
-      <div class="alert alert-error"><span>⚠️</span><div id="errorText"></div></div>
-    </div>
-
-    <div id="resultsSection" class="hidden">
-      <div class="card">
-        <h2 id="resultsTitle"></h2>
-        <div id="routesList"></div>
-      </div>
-    </div>
-
-    <div id="instructionsSection" class="card">
-      <h3>✨ 7-Layer Ultra Defense System:</h3>
-      <div style="margin-top:16px;padding:16px;background:#e6fffa;border-radius:10px;font-size:13px">
-        <strong style="font-size:14px">🛡️ Processing Layers:</strong>
-        <ul style="margin-top:10px;padding-left:20px;line-height:1.8">
-          <li><strong>Layer 0:</strong> Advanced Image Pre-Processing (contrast, sharpen, denoise)</li>
-          <li><strong>Layer 1:</strong> OCR (Tesseract.js) with timeout + fallback</li>
-          <li><strong>Layer 2:</strong> Row parsing with postcode detection</li>
-          <li><strong>Layer 3:</strong> Aggressive metadata removal</li>
-          <li><strong>Layer 4:</strong> UK Postcode validation & spacing fix</li>
-          <li><strong>Layer 5:</strong> Address reconstruction & normalisation</li>
-          <li><strong>Layer 6:</strong> Manual editing & verification</li>
-        </ul>
-      </div>
-    </div>
   </div>
-
-  <!-- Tesseract.js -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js"></script>
 
   <script>
     'use strict';
 
-    // ===== STATE =====
-    let images = [];
-    let isProcessing = false;
-    let abortProcessing = false;
-    let debugMode = true; // Default to true for troubleshooting
-    let enablePreprocessing = true;
-    let enableManualEdit = true;
-    let extractedAddresses = [];
-    let tesseractWorker = null;
-    let workerInitialized = false;
+    // Display environment info immediately
+    document.getElementById('envInfo').textContent = JSON.stringify({
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      online: navigator.onLine,
+      cookieEnabled: navigator.cookieEnabled,
+      doNotTrack: navigator.doNotTrack,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      maxTouchPoints: navigator.maxTouchPoints,
+      vendor: navigator.vendor,
+      webdriver: navigator.webdriver,
+      location: window.location.href,
+      protocol: window.location.protocol,
+      host: window.location.host,
+      localStorage: typeof localStorage !== 'undefined',
+      sessionStorage: typeof sessionStorage !== 'undefined',
+      indexedDB: typeof indexedDB !== 'undefined',
+      serviceWorker: 'serviceWorker' in navigator,
+      webWorker: typeof Worker !== 'undefined',
+      sharedWorker: typeof SharedWorker !== 'undefined'
+    }, null, 2);
 
-    // ===== DEBUG UTILITIES =====
-    function escapeHtml(s){
-      if (typeof s !== 'string') return String(s);
-      return s.replace(/[&<>"']/g,(m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-    }
+    function addResult(title, status, message, details = null) {
+      const results = document.getElementById('diagnosticResults');
+      const statusClass = status === 'pass' ? 'status-pass' : status === 'fail' ? 'status-fail' : 'status-pending';
+      const statusText = status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⏳';
+      
+      const resultDiv = document.createElement('div');
+      resultDiv.className = 'diagnostic-result';
+      resultDiv.innerHTML = `
+        <div style="font-weight:600;margin-bottom:8px">
+          <span class="status-indicator ${statusClass}"></span>
+          ${statusText} ${title}
+        </div>
+        <div style="color:var(--gray-600)">${message}</div>
+        ${details ? `<pre style="margin-top:8px;font-size:11px">${details}</pre>` : ''}
 
-    function debugLog(message, data = null, level = 'info') {
-      console.log(`[${level.toUpperCase()}] ${message}`, data || '');
-      
-      if (!debugMode) return;
-      
-      const panel = document.getElementById('debugPanel');
-      if (!panel) return;
-      
-      panel.classList.remove('hidden');
-      const timestamp = new Date().toLocaleTimeString();
-      const levelClass = level === 'error' ? 'error' : level === 'warning' ? 'warning' : 'info';
-      
-      if (data) {
-        const dataStr = typeof data === 'object' ? JSON.stringify(data, null, 2) : String(data);
-        panel.innerHTML += `<div class="${levelClass}">[${timestamp}] ${escapeHtml(message)}</div><pre>${escapeHtml(dataStr)}</pre>`;
-      } else {
-        panel.innerHTML += `<div class="${levelClass}">[${timestamp}] ${escapeHtml(message)}</div>`;
-      }
-      panel.scrollTop = panel.scrollHeight;
-    }
+```
+  `;
+  results.appendChild(resultDiv);
+  return resultDiv;
+}
 
-    function updateProcessingStage(stage, status) {
-      const stageEl = document.getElementById(`stage-${stage}`);
-      if (!stageEl) return;
-      stageEl.className = `processing-stage ${status}`;
-      const icon = stageEl.querySelector('.icon');
-      switch (status) {
-        case 'processing': icon.textContent = '⏳'; break;
-        case 'complete':   icon.textContent = '✓';  break;
-        case 'error':      icon.textContent = '✗';  break;
-        default:           icon.textContent = '○';
-      }
-    }
+function addRecommendation(text) {
+  const recs = document.getElementById('recommendations');
+  const rec = document.createElement('div');
+  rec.className = 'alert alert-warning';
+  rec.innerHTML = `<span>💡</span><span>${text}</span>`;
+  recs.appendChild(rec);
+}
 
-    // ===== TIMEOUT UTILITY =====
-    function withTimeout(promise, ms, label='Operation') {
-      let timeoutId;
-      const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => {
-          reject(new Error(`${label} timed out after ${ms}ms`));
-        }, ms);
-      });
-      
-      return Promise.race([
-        promise.finally(() => clearTimeout(timeoutId)),
-        timeoutPromise
-      ]);
-    }
+async function testCDN() {
+  document.getElementById('diagnosticResults').innerHTML = '';
+  document.getElementById('recommendations').innerHTML = '';
+  
+  addResult('CDN Access Test', 'pending', 'Testing access to jsdelivr CDN...', null);
 
-    // ===== POSTCODES + RULES =====
-    const UK_POSTCODE_STRICT = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/i;
-    const UK_POSTCODE_FINDALL = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/gi;
-    const THOROUGHFARES = /\b(Road|Rd|Street|St|Lane|Ln|Avenue|Ave|Drive|Dr|Close|Way|Place|Court|Gardens?|Square|Crescent|Cres|Grove|Park|Hill|View|Mews|Parade|Terrace|Walk|Row)\b/i;
-    const UNIT_HINTS = /\b(Flat|Apt|Apartment|Unit|Suite|Room|Rm|House|Bldg|Building|Block)\b/i;
-    const AREAS = /\b(London|Middlesex|Surrey|Kent|Essex|Herts|Hertfordshire|Bucks|Buckinghamshire|Berkshire|Oxfordshire|Bedfordshire|Hillingdon|Harrow|Ealing|Hounslow|Brent|Barnet|Camden|Westminster|Kensington|Chelsea|Islington|Southwark|Lambeth|Wandsworth|Ruislip|Pinner|Northwood|Eastcote|Ickenham|Uxbridge|Hayes|Stanmore)\b/i;
-    const IGNORE_TOKENS = [
-      'Del Weight','Del Items','Deadline','Service Level','Signature','Remarks',
-      'Contact Nos','Ref','Name & Time','Security','Tracking','Barcode','Driver',
-      'Route','Time Window','Priority','POD','GPS','Manifest','Run','Stop',
-      'Delivery','Collection','Col Weight','Col Items'
+  try {
+    // Test multiple CDN endpoints
+    const cdns = [
+      'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js',
+      'https://unpkg.com/tesseract.js@v5.0.5/dist/tesseract.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.5/tesseract.min.js'
     ];
 
-    function fixOcrArtifacts(s) {
-      return s
-        .replace(/[\u2010-\u2015]/g, '-')
-        .replace(/[|¦]/g, ' ')
-        .replace(/\bHAO\b/gi, 'HA0')
-        .replace(/\bHAG\b/gi, 'HA6')
-        .replace(/\b([A-Z]{1,2}\d{1,2}[A-Z]?)\s*([0O]\w\w)\b/gi, (_, a, b)=>`${a} ${b.replace(/^O/,'0')}`)
-        .replace(/\b([A-Z]{1,2})\s+(\d)/g, '$1$2')
-        .replace(/\s{2,}/g, ' ')
-        .trim();
-    }
-
-    function stripMetadata(line) {
-      let s = line;
-      for (const kw of IGNORE_TOKENS) {
-        const rx = new RegExp(kw.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&') + '\\s*[^,|\\n]*','gi');
-        s = s.replace(rx,' ');
-      }
-      s = s.replace(/\b\d{1,2}:\d{2}\b/g,' ');
-      s = s.replace(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g,' ');
-      s = s.replace(/\+?[\d()\-\s]{10,}/g,' ');
-      s = s.replace(/\bRef:?\s*\S+/gi,' ');
-      s = s.replace(/^\s*\d{1,3}\s*[.|-]?\s*/,' ');
-      s = s.replace(/\b[A-Z]{2,}\d{5,}\b/g,' ');
-      s = s.replace(/[|]/g,' ').replace(/\s{2,}/g,' ').replace(/\s*,\s*,+/g, ',').trim();
-      return fixOcrArtifacts(s);
-    }
-
-    const NAME_PREFIX = /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sir|Lady|Lord)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?[, ]*/g;
-    const ALLCAPS_NAME_AT_START = /^[A-Z]{2,}(?:\s+[A-Z]{2,}){0,2}\s*,\s*/;
-
-    function removePersonalNames(s) { 
-      return s.replace(NAME_PREFIX,'').replace(ALLCAPS_NAME_AT_START,'').trim(); 
-    }
-
-    function normaliseAddressParts(parts) {
-      const kept = parts
-        .map(p=>p.trim())
-        .filter(p => p && (THOROUGHFARES.test(p) || UNIT_HINTS.test(p) || AREAS.test(p) || /\d+[A-Z]?/i.test(p)));
-      return Array.from(new Set(kept)).join(', ').replace(/\s*,\s*/g, ', ');
-    }
-
-    function reconstructFromLine(line) {
-      const fixed = removePersonalNames(stripMetadata(line));
-      const m = fixed.match(UK_POSTCODE_STRICT);
-      if (!m) return null;
-      const pc = m[1].toUpperCase().replace(/\s?([0-9][A-Z]{2})$/, ' $1');
-      const left = fixed.slice(0, m.index).replace(/\b(GB|UK)\b/gi,'').trim();
-      const right = fixed.slice(m.index + m[0].length).replace(/\b(GB|UK)\b/gi,'').trim();
-      const parts = (left + (right ? ' ' + right : '')).split(/[,|\n]+/).map(s=>s.trim()).filter(Boolean);
-      const addr = normaliseAddressParts(parts);
-      if (!addr) return null;
-      const final = `${addr}, ${pc} GB`.replace(/\s{2,}/g,' ').trim();
-      return final.length > 10 ? final : null;
-    }
-
-    function parseOcrToAddresses(text) {
-      updateProcessingStage(2, 'processing');
-      debugLog('🔍 Layer 2: Parsing OCR text to addresses');
-      const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-      const out = [];
-      let n = 1;
-      for (const raw of lines) {
-        if (!UK_POSTCODE_FINDALL.test(raw)) continue;
-        const addr = reconstructFromLine(raw);
-        if (addr) out.push({ num: n++, address: addr });
-      }
-      updateProcessingStage(2, out.length ? 'complete' : 'error');
-      debugLog(`✅ Layer 2: Extracted ${out.length} potential addresses`);
-      return out;
-    }
-
-    function validateAndCleanAddresses(addresses) {
-      updateProcessingStage(3, 'processing');
-      debugLog(`🔧 Layer 3-6: Deep cleaning ${addresses.length} addresses...`);
-      const valid = [];
-      const invalid = [];
-      
-      for (const item of addresses) {
-        let address = typeof item === 'string' ? item : item.address;
-        if (typeof address !== 'string') continue;
-        
-        address = fixOcrArtifacts(address);
-        const pcMatch = address.match(UK_POSTCODE_STRICT);
-        
-        if (!pcMatch) {
-          const recon = reconstructFromLine(address);
-          if (recon) address = recon; 
-          else { 
-            invalid.push(address); 
-            debugLog(`❌ Invalid (no postcode): ${address}`, null, 'warning');
-            continue; 
-          }
-        }
-        
-        if (!/\b(GB|UK)\b$/i.test(address)) address += ' GB';
-        
-        address = address
-          .replace(/\b(Deadline|Service Level|Del Weight|Del Items|Ref):[^,]*/gi,'')
-          .replace(/\|\s*/g,'')
-          .replace(/\s+/g,' ')
-          .trim();
-        
-        if (address.length > 15 && UK_POSTCODE_STRICT.test(address)) {
-          valid.push({ num: item.num || (valid.length + 1), address });
-          debugLog(`✅ Valid: ${address}`);
-        } else {
-          invalid.push(address);
-          debugLog(`❌ Invalid (too short or malformed): ${address}`, null, 'warning');
-        }
-      }
-      
-      const seen = new Set(); 
-      const dedup = [];
-      for (const a of valid) {
-        const key = a.address.toUpperCase();
-        if (!seen.has(key)) { 
-          seen.add(key); 
-          dedup.push(a); 
-        }
-      }
-      
-      updateProcessingStage(3, 'complete');
-      debugLog(`✅ Layer 3-6: ${dedup.length} valid unique addresses, ${invalid.length} invalid`);
-      return { valid: dedup, invalid };
-    }
-
-    // ===== IMAGE PRE-PROCESS =====
-    async function preprocessImage(file) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        const reader = new FileReader();
-        
-        reader.onerror = (err) => {
-          debugLog(`❌ FileReader error for ${file.name}`, err, 'error');
-          reject(new Error(`Failed to read file: ${file.name}`));
-        };
-        
-        reader.onload = (e) => {
-          img.onerror = (err) => {
-            debugLog(`❌ Image load error for ${file.name}`, err, 'error');
-            reject(new Error(`Failed to load image: ${file.name}`));
-          };
-          
-          img.onload = () => {
-            try {
-              const canvas = document.getElementById('previewCanvas');
-              if (!canvas) {
-                throw new Error('Canvas element not found');
-              }
-              
-              const ctx = canvas.getContext('2d', { willReadFrequently: true });
-              if (!ctx) {
-                throw new Error('Failed to get canvas context');
-              }
-
-              // Reasonable size limits for OCR performance
-              const MAX_W = 1400, MAX_H = 2000;
-              let w = img.width, h = img.height;
-              const r = Math.min(1, MAX_W / w, MAX_H / h);
-              canvas.width = Math.round(w * r);
-              canvas.height = Math.round(h * r);
-              
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = 'high';
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-              if (!enablePreprocessing) {
-                debugLog(`📸 Basic processing only: ${file.name}`);
-                canvas.classList.remove('hidden');
-                resolve();
-                return;
-              }
-
-              // Get image data
-              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-              const data = imageData.data;
-
-              debugLog(`📸 Advanced pre-processing: ${file.name} (${canvas.width}x${canvas.height})`);
-
-              // 1) Greyscale
-              for (let i = 0; i < data.length; i += 4) {
-                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                data[i] = data[i + 1] = data[i + 2] = gray;
-              }
-              
-              // 2) Contrast enhancement
-              const cf = 1.5;
-              for (let i = 0; i < data.length; i += 4) {
-                const v = Math.min(255, Math.max(0, (data[i] - 128) * cf + 128));
-                data[i] = data[i + 1] = data[i + 2] = v;
-              }
-              
-              // 3) Sharpen
-              const width = canvas.width, height = canvas.height;
-              const kernel = [0,-1,0,-1,5,-1,0,-1,0];
-              const out = new Uint8ClampedArray(data);
-              
-              for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                  let sum = 0;
-                  for (let ky = -1; ky <= 1; ky++) {
-                    for (let kx = -1; kx <= 1; kx++) {
-                      const idx = ((y + ky) * width + (x + kx)) * 4;
-                      const kidx = (ky + 1) * 3 + (kx + 1);
-                      sum += data[idx] * kernel[kidx];
-                    }
-                  }
-                  const idx = (y * width + x) * 4;
-                  out[idx] = out[idx + 1] = out[idx + 2] = Math.min(255, Math.max(0, sum));
-                }
-              }
-              
-              // 4) Threshold
-              const threshold = 180;
-              for (let i = 0; i < out.length; i += 4) {
-                const v = out[i] > threshold ? 255 : out[i] < 60 ? 0 : out[i];
-                out[i] = out[i + 1] = out[i + 2] = v;
-              }
-              
-              ctx.putImageData(new ImageData(out, width, height), 0, 0);
-              canvas.classList.remove('hidden');
-              
-              debugLog(`✅ Pre-processing complete: ${file.name}`);
-              resolve();
-            } catch (err) {
-              debugLog(`❌ Pre-processing error for ${file.name}`, err, 'error');
-              reject(err);
-            }
-          };
-          
-          img.src = e.target.result;
-        };
-        
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // ===== OCR WORKER WITH ROBUST ERROR HANDLING =====
-    async function initializeOcrWorker() {
-      if (workerInitialized && tesseractWorker) {
-        debugLog('✅ OCR worker already initialized');
-        return tesseractWorker;
-      }
-
-      debugLog('🔧 Initializing OCR worker...');
-      
+    for (const cdn of cdns) {
       try {
-        // Check if Tesseract is loaded
-        if (typeof Tesseract === 'undefined') {
-          throw new Error('Tesseract.js library not loaded. Check your internet connection.');
-        }
-
-        // Create worker with timeout
-        tesseractWorker = await withTimeout(
-          Tesseract.createWorker({ 
-            logger: (m) => {
-              if (debugMode && m.status) {
-                const progress = Math.round((m.progress || 0) * 100);
-                debugLog(`🧩 OCR Worker: ${m.status} ${progress}%`);
-              }
-            }
-          }),
-          30000,
-          'Worker creation'
-        );
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         
-        debugLog('✅ Worker created, loading language...');
-        
-        await withTimeout(tesseractWorker.load(), 20000, 'Worker load');
-        debugLog('✅ Worker loaded, initializing language...');
-        
-        await withTimeout(tesseractWorker.loadLanguage('eng'), 20000, 'Language load');
-        debugLog('✅ Language loaded, initializing...');
-        
-        await withTimeout(tesseractWorker.initialize('eng'), 20000, 'Worker initialize');
-        debugLog('✅ Worker initialized, setting parameters...');
-        
-        await withTimeout(
-          tesseractWorker.setParameters({
-            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.-:/#()[]|&'\""
-          }),
-          10000,
-          'Set parameters'
-        );
-        
-        workerInitialized = true;
-        debugLog('✅ OCR worker fully initialized and ready!');
-        return tesseractWorker;
-        
-      } catch (error) {
-        debugLog(`❌ OCR worker initialization failed: ${error.message}`, error, 'error');
-        
-        // Clean up failed worker
-        if (tesseractWorker) {
-          try {
-            await tesseractWorker.terminate();
-          } catch (e) {
-            debugLog('Failed to terminate worker after error', e, 'warning');
-          }
-          tesseractWorker = null;
-        }
-        workerInitialized = false;
-        
-        throw new Error(
-          `Failed to initialize OCR engine: ${error.message}\n\n` +
-          'Troubleshooting:\n' +
-          '1. Check your internet connection\n' +
-          '2. Ensure Tesseract.js CDN is accessible\n' +
-          '3. Try refreshing the page\n' +
-          '4. Check browser console for detailed errors'
-        );
-      }
-    }
-
-    async function releaseOcrWorker() {
-      if (tesseractWorker) {
-        try {
-          debugLog('🔧 Terminating OCR worker...');
-          await withTimeout(tesseractWorker.terminate(), 5000, 'Worker termination');
-          debugLog('✅ OCR worker terminated');
-        } catch (e) {
-          debugLog('⚠️ Error terminating worker', e, 'warning');
-        } finally {
-          tesseractWorker = null;
-          workerInitialized = false;
-        }
-      }
-    }
-
-    async function recognizeWithTimeout(canvas, msPrimary = 30000, msFallback = 25000) {
-      if (!tesseractWorker || !workerInitialized) {
-        throw new Error('OCR worker not initialized');
-      }
-
-      try {
-        debugLog('🧠 Starting OCR recognition (primary mode)...');
-        await tesseractWorker.setParameters({ 
-          tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK 
+        const response = await fetch(cdn, { 
+          method: 'HEAD',
+          signal: controller.signal 
         });
+        clearTimeout(timeoutId);
         
-        const result = await withTimeout(
-          tesseractWorker.recognize(canvas), 
-          msPrimary, 
-          'OCR recognition (primary)'
-        );
-        
-        debugLog('✅ OCR recognition successful (primary mode)');
-        return result;
-        
-      } catch (e) {
-        debugLog(`⚠️ Primary OCR failed: ${e.message}. Trying fallback mode...`, null, 'warning');
-        
-        try {
-          await tesseractWorker.setParameters({ 
-            tessedit_pageseg_mode: Tesseract.PSM.AUTO 
-          });
-          
-          const result = await withTimeout(
-            tesseractWorker.recognize(canvas), 
-            msFallback, 
-            'OCR recognition (fallback)'
+        if (response.ok) {
+          addResult(
+            'CDN Access', 
+            'pass', 
+            `Successfully connected to: ${new URL(cdn).hostname}`,
+            `Status: ${response.status} ${response.statusText}\nURL: ${cdn}`
           );
-          
-          debugLog('✅ OCR recognition successful (fallback mode)');
-          return result;
-          
-        } catch (fallbackError) {
-          debugLog(`❌ Both OCR modes failed`, fallbackError, 'error');
-          throw new Error(`OCR failed: ${fallbackError.message}`);
-        }
-      }
-    }
-
-    async function processWithOCR(canvas, filename) {
-      updateProcessingStage(1, 'processing');
-      debugLog(`🧠 Layer 1: Starting OCR for ${filename}`);
-      
-      try {
-        const { data } = await recognizeWithTimeout(canvas);
-        const text = data.text || '';
-        
-        updateProcessingStage(1, 'complete');
-        debugLog(`✅ Layer 1: OCR complete - ${text.length} characters extracted`);
-        
-        if (text.length < 10) {
-          debugLog('⚠️ OCR extracted very little text', null, 'warning');
-        }
-        
-        return text;
-        
-      } catch (err) {
-        updateProcessingStage(1, 'error');
-        debugLog(`❌ Layer 1 OCR failed: ${err.message}`, err, 'error');
-        throw new Error(`OCR processing failed for ${filename}: ${err.message}`);
-      }
-    }
-
-    // ===== MAIN PROCESSING =====
-    async function processImages() {
-      // Validation
-      if (images.length === 0) { 
-        showError('Please upload at least one image'); 
-        return; 
-      }
-
-      // Prevent double-processing
-      if (isProcessing) {
-        debugLog('⚠️ Already processing, ignoring duplicate call', null, 'warning');
-        return;
-      }
-
-      debugLog('\n='.repeat(50));
-      debugLog('🚀 STARTING NEW PROCESSING SESSION');
-      debugLog('='.repeat(50));
-
-      // Initialize state
-      abortProcessing = false;
-      isProcessing = true;
-      enablePreprocessing = document.getElementById('enablePreprocessing').checked;
-      enableManualEdit = document.getElementById('enableManualEdit').checked;
-      debugMode = document.getElementById('enableDebug').checked;
-      
-      debugLog(`Configuration: preprocess=${enablePreprocessing}, manualEdit=${enableManualEdit}, debug=${debugMode}`);
-      
-      updateProcessButton();
-
-      // Reset UI
-      document.getElementById('errorSection').classList.add('hidden');
-      document.getElementById('resultsSection').classList.add('hidden');
-      document.getElementById('extractedSection').classList.add('hidden');
-      document.getElementById('instructionsSection').classList.add('hidden');
-      document.getElementById('progressSection').classList.remove('hidden');
-      document.getElementById('debugPanel').innerHTML = '';
-
-      // Setup stages
-      const stagesHtml = `
-        <div id="stage-init" class="processing-stage pending"><div class="icon">○</div><div>Initializing OCR Engine</div></div>
-        <div id="stage-0" class="processing-stage pending"><div class="icon">○</div><div>Layer 0: Image Pre-Processing</div></div>
-        <div id="stage-1" class="processing-stage pending"><div class="icon">○</div><div>Layer 1: OCR Extraction</div></div>
-        <div id="stage-2" class="processing-stage pending"><div class="icon">○</div><div>Layer 2: Parse & Reconstruct</div></div>
-        <div id="stage-3" class="processing-stage pending"><div class="icon">○</div><div>Layer 3-6: Cleaning & Validation</div></div>`;
-      document.getElementById('processingStages').innerHTML = stagesHtml;
-
-      const allAddresses = [];
-      const allInvalid = [];
-      let failedImages = 0;
-      let processedSuccessfully = 0;
-
-      try {
-        // Initialize OCR worker first
-        updateProcessingStage('init', 'processing');
-        document.getElementById('progressText').textContent = 'Initializing OCR engine...';
-        
-        await initializeOcrWorker();
-        updateProcessingStage('init', 'complete');
-
-        if (abortProcessing) {
-          debugLog('⛔ Processing cancelled during initialization');
-          throw new Error('Processing cancelled by user');
-        }
-
-        // Process each image
-        for (let i = 0; i < images.length; i++) {
-          if (abortProcessing) { 
-            debugLog('⛔ Processing cancelled by user'); 
-            break; 
-          }
-
-          const progress = ((i + 1) / images.length) * 100;
-          document.getElementById('progressBar').style.width = progress + '%';
-          document.getElementById('progressText').textContent = 
-            `Processing image ${i + 1}/${images.length}: ${images[i].name}`;
-
-          debugLog(`\n${'='.repeat(40)}`);
-          debugLog(`📸 IMAGE ${i + 1}/${images.length}: ${images[i].name}`);
-          debugLog(`${'='.repeat(40)}`);
-
-          try {
-            // Pre-process image
-            if (enablePreprocessing) updateProcessingStage(0, 'processing');
-            await preprocessImage(images[i]);
-            if (enablePreprocessing) updateProcessingStage(0, 'complete');
-
-            if (abortProcessing) break;
-
-            // Run OCR
-            const canvas = document.getElementById('previewCanvas');
-            if (!canvas) {
-              throw new Error('Canvas element not found');
-            }
-            
-            const ocrText = await processWithOCR(canvas, images[i].name);
-
-            if (abortProcessing) break;
-
-            // Parse addresses
-            const parsed = parseOcrToAddresses(ocrText);
-            debugLog(`Parsed ${parsed.length} potential addresses from OCR text`);
-
-            // Validate and clean
-            const { valid, invalid } = validateAndCleanAddresses(parsed);
-
-            if (valid.length > 0) {
-              allAddresses.push(...valid);
-              processedSuccessfully++;
-              debugLog(`✅ Image ${i + 1}: Extracted ${valid.length} valid addresses`);
-            }
-            
-            if (invalid.length > 0) {
-              allInvalid.push(...invalid);
-              debugLog(`⚠️ Image ${i + 1}: ${invalid.length} addresses were invalid/skipped`, null, 'warning');
-            }
-            
-            if (valid.length === 0 && parsed.length === 0) {
-              failedImages++;
-              debugLog(`❌ Image ${i + 1}: No addresses found`, null, 'error');
-            }
-
-          } catch (imgError) {
-            failedImages++;
-            debugLog(`❌ Image ${i + 1} processing error: ${imgError.message}`, imgError, 'error');
-            
-            // Continue with next image instead of stopping completely
-            showWarning(`Failed to process ${images[i].name}: ${imgError.message}`);
-          }
-
-          // Small delay between images to prevent UI freezing
-          await new Promise(r => setTimeout(r, 100));
-        }
-
-        if (abortProcessing) {
-          throw new Error('Processing cancelled by user');
-        }
-
-        debugLog('\n' + '='.repeat(50));
-        debugLog('🏁 PROCESSING COMPLETE');
-        debugLog('='.repeat(50));
-
-        // Deduplicate and finalize
-        const uniqueAddresses = allAddresses
-          .filter((addr, index, self) => 
-            index === self.findIndex(a => a.address === addr.address))
-          .sort((a, b) => a.num - b.num);
-
-        debugLog(`Final results: ${uniqueAddresses.length} unique valid addresses`);
-        debugLog(`Total extracted: ${allAddresses.length}, Invalid: ${allInvalid.length}, Failed images: ${failedImages}`);
-
-        // Update stats
-        document.getElementById('totalExtracted').textContent = allAddresses.length.toString();
-        document.getElementById('validAddresses').textContent = uniqueAddresses.length.toString();
-        document.getElementById('invalidAddresses').textContent = allInvalid.length.toString();
-
-        extractedAddresses = uniqueAddresses;
-
-        if (uniqueAddresses.length > 0) {
-          document.getElementById('extractedSection').classList.remove('hidden');
-          const editor = document.getElementById('addressEditor');
-          editor.value = uniqueAddresses.map(a => a.address).join('\n');
-          
-          if (!enableManualEdit) {
-            debugLog('Auto-generating routes (manual edit disabled)');
-            generateRoutes();
-          } else {
-            debugLog('Manual editing enabled - waiting for user to review addresses');
-          }
-        } else {
-          throw new Error(
-            `❌ No valid addresses extracted from ${images.length} image(s).\n\n` +
-            `Results:\n` +
-            `• Successfully processed: ${processedSuccessfully}/${images.length} images\n` +
-            `• Failed images: ${failedImages}\n` +
-            `• Invalid addresses found: ${allInvalid.length}\n\n` +
-            `Troubleshooting:\n` +
-            `1. Ensure images contain clear UK delivery addresses\n` +
-            `2. Check that UK postcodes are visible (e.g., HA6 2WQ, SW1A 1AA)\n` +
-            `3. Enable "Advanced Image Pre-Processing" if disabled\n` +
-            `4. Review Debug Information above for details\n` +
-            `5. Try higher resolution images if text is unclear`
-          );
-        }
-
-        if (failedImages > 0) {
-          showWarning(`⚠️ ${failedImages} out of ${images.length} images failed to process. Check debug log for details.`);
-        }
-
-      } catch (err) {
-        debugLog(`\n❌❌❌ FATAL ERROR ❌❌❌`, err, 'error');
-        debugLog(`Error message: ${err.message}`);
-        debugLog(`Error stack: ${err.stack}`);
-        
-        showError(err.message || 'An unexpected error occurred during processing');
-        
-        // Mark all stages as error
-        ['init', 0, 1, 2, 3].forEach(stage => updateProcessingStage(stage, 'error'));
-        
-      } finally {
-        // Cleanup
-        try {
-          await releaseOcrWorker();
-        } catch (e) {
-          debugLog('Error during cleanup', e, 'warning');
-        }
-        
-        isProcessing = false;
-        abortProcessing = false;
-        updateProcessButton();
-        
-        // Hide progress section after a short delay if we have results
-        if (extractedAddresses.length > 0) {
-          setTimeout(() => {
-            document.getElementById('progressSection').classList.add('hidden');
-          }, 1000);
-        }
-        
-        debugLog('\n' + '='.repeat(50));
-        debugLog('🏁 SESSION COMPLETE');
-        debugLog('='.repeat(50) + '\n');
-      }
-    }
-
-    // ===== ROUTE GENERATION =====
-    function generateRoutes() {
-      debugLog('📍 Generating routes...');
-      
-      const editor = document.getElementById('addressEditor');
-      const addresses = editor.value
-        .split('\n')
-        .map(a => a.trim())
-        .filter(Boolean);
-
-      if (addresses.length === 0) { 
-        showError('No addresses available to generate routes'); 
-        return; 
-      }
-
-      debugLog(`Generating routes for ${addresses.length} addresses`);
-
-      const groups = [];
-      const maxStopsPerGroup = 14;
-
-      for (let i = 0; i < addresses.length; i += maxStopsPerGroup) {
-        const group = addresses.slice(i, Math.min(i + maxStopsPerGroup, addresses.length));
-        const destinations = group.map(addr => encodeURIComponent(addr)).join('&daddr=');
-        
-        groups.push({
-          id: Math.floor(i / maxStopsPerGroup) + 1,
-          startStop: i + 1,
-          endStop: Math.min(i + maxStopsPerGroup, addresses.length),
-          count: group.length,
-          stops: group.map((addr, idx) => ({ 
-            num: i + idx + 1, 
-            address: addr 
-          })),
-          link: `https://maps.apple.com/?daddr=${destinations}`
-        });
-      }
-
-      debugLog(`✅ Generated ${groups.length} route(s)`);
-      displayResults(groups, addresses.length);
-    }
-
-    function reprocessImages() { 
-      debugLog('🔄 Reprocessing images...');
-      processImages(); 
-    }
-
-    // ===== UI FUNCTIONS =====
-    function updateImageList() {
-      const listDiv = document.getElementById('imageList');
-      const previewCanvas = document.getElementById('previewCanvas');
-      
-      if (images.length === 0) { 
-        listDiv.innerHTML = ''; 
-        previewCanvas.classList.add('hidden'); 
-        return; 
-      }
-
-      const header = document.createElement('div');
-      header.style.cssText = 'color: var(--success); font-size: 14px; margin-bottom: 12px; font-weight: 600;';
-      header.textContent = `✓ ${images.length} image(s) selected`;
-      
-      listDiv.innerHTML = '';
-      listDiv.appendChild(header);
-
-      images.forEach((img, idx) => {
-        const item = document.createElement('div');
-        item.className = 'image-item';
-        item.innerHTML = `
-          <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${escapeHtml(img.name)}</span>
-          <span style="font-size:11px;color:var(--gray-600);margin-right:12px">${formatFileSize(img.size)}</span>
-          <button class="remove-btn" onclick="removeImage(${idx})">Remove</button>`;
-        listDiv.appendChild(item);
-      });
-    }
-
-    function formatFileSize(bytes) { 
-      if (bytes < 1024) return bytes + ' B'; 
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'; 
-      return (bytes / (1024 * 1024)).toFixed(1) + ' MB'; 
-    }
-
-    function removeImage(idx) { 
-      debugLog(`Removing image: ${images[idx].name}`);
-      images.splice(idx, 1); 
-      updateImageList(); 
-      updateProcessButton(); 
-    }
-
-    function updateProcessButton() {
-      const btn = document.getElementById('processBtn');
-      const cancel = document.getElementById('cancelBtn');
-      
-      btn.disabled = !(images.length > 0 && !isProcessing);
-      cancel.disabled = !isProcessing;
-      
-      if (isProcessing) {
-        btn.innerHTML = '<span class="spinner"></span> Processing…';
-      } else {
-        btn.textContent = '🧠 Process with Ultra Robust AI (7 Layers)';
-      }
-    }
-
-    function displayResults(groups, totalStops) {
-      debugLog('📊 Displaying results');
-      
-      document.getElementById('resultsTitle').innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span>✓ ${totalStops} Deliveries Ready</span>
-          <span style="font-size:14px;color:var(--gray-600)">${groups.length} route(s) generated</span>
-        </div>`;
-
-      const list = document.getElementById('routesList');
-      list.innerHTML = '';
-
-      groups.forEach(g => {
-        const card = document.createElement('div');
-        card.className = 'route-card';
-        card.innerHTML = `
-          <div class="route-header">
-            <div>
-              <div style="font-weight:600;font-size:18px">Route ${g.id}</div>
-              <div style="color:var(--gray-600);font-size:13px">Stops ${g.startStop}-${g.endStop}</div>
-            </div>
-            <div class="badge">${g.count} stops</div>
-          </div>
-          <a href="${g.link}" target="_blank" class="btn btn-primary" style="text-decoration:none">🗺️ Open in Apple Maps</a>
-          <button class="btn btn-secondary" onclick="copyLink('${g.link.replace(/'/g, "\\'")}')">📋 Copy Link</button>
-          <button class="btn btn-secondary" onclick="copyAddresses(${g.id})">📄 Copy All Addresses</button>
-          <div class="show-addresses" onclick="toggleAddresses(this)">▼ Show ${g.count} addresses</div>
-          <div class="address-list" id="addresses-${g.id}">
-            ${g.stops.map(s => `
-              <div class="address-item">
-                <span class="stop-num">${s.num}.</span>${escapeHtml(s.address)}
-              </div>
-            `).join('')}
-          </div>`;
-        list.appendChild(card);
-      });
-
-      document.getElementById('resultsSection').classList.remove('hidden');
-      document.getElementById('extractedSection').classList.add('hidden');
-      
-      setTimeout(() => {
-        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-
-    function toggleAddresses(el) {
-      const list = el.nextElementSibling;
-      if (list.style.display === 'block') { 
-        list.style.display = 'none'; 
-        el.textContent = el.textContent.replace('▲', '▼'); 
-      } else { 
-        list.style.display = 'block'; 
-        el.textContent = el.textContent.replace('▼', '▲'); 
-      }
-    }
-
-    function copyLink(link) {
-      navigator.clipboard.writeText(link)
-        .then(() => showSuccess('✓ Route link copied to clipboard'))
-        .catch(() => showError('❌ Failed to copy link'));
-    }
-
-    function copyAddresses(groupId) {
-      const addressList = document.getElementById(`addresses-${groupId}`);
-      const addresses = Array.from(addressList.querySelectorAll('.address-item'))
-        .map(item => item.textContent.trim())
-        .join('\n');
-      
-      navigator.clipboard.writeText(addresses)
-        .then(() => showSuccess('✓ All addresses copied to clipboard'))
-        .catch(() => showError('❌ Failed to copy addresses'));
-    }
-
-    function showError(message) {
-      debugLog(`Showing error to user: ${message}`, null, 'error');
-      
-      const errorSection = document.getElementById('errorSection');
-      document.getElementById('errorText').innerHTML = escapeHtml(message).replace(/\n/g, '<br>');
-      errorSection.classList.remove('hidden');
-      
-      setTimeout(() => {
-        errorSection.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-
-    function showSuccess(message) {
-      const alert = document.createElement('div');
-      alert.className = 'alert alert-success';
-      alert.innerHTML = `<span>✓</span><span>${escapeHtml(message)}</span>`;
-      alert.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:250px;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
-      document.body.appendChild(alert);
-      
-      setTimeout(() => alert.remove(), 3000);
-    }
-
-    function showWarning(message) {
-      debugLog(`Warning: ${message}`, null, 'warning');
-      
-      const alert = document.createElement('div');
-      alert.className = 'alert alert-warning';
-      alert.innerHTML = `<span>⚠️</span><span>${escapeHtml(message)}</span>`;
-      
-      const extractedSection = document.getElementById('extractedSection');
-      if (!extractedSection.classList.contains('hidden')) {
-        extractedSection.prepend(alert);
-      } else {
-        alert.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:300px;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
-        document.body.appendChild(alert);
-        setTimeout(() => alert.remove(), 5000);
-      }
-    }
-
-    // ===== GLOBAL ERROR HANDLERS =====
-    window.addEventListener('error', (e) => {
-      debugLog(`❗ Uncaught error: ${e.message}`, {
-        filename: e.filename,
-        lineno: e.lineno,
-        colno: e.colno,
-        error: e.error
-      }, 'error');
-      
-      if (isProcessing) {
-        isProcessing = false;
-        abortProcessing = false;
-        updateProcessButton();
-        showError(`An unexpected error occurred: ${e.message}`);
-      }
-    });
-
-    window.addEventListener('unhandledrejection', (e) => {
-      debugLog(`❗ Unhandled promise rejection: ${e.reason?.message || e.reason}`, {
-        reason: e.reason,
-        promise: e.promise
-      }, 'error');
-      
-      if (isProcessing) {
-        isProcessing = false;
-        abortProcessing = false;
-        updateProcessButton();
-        try { 
-          document.getElementById('progressSection').classList.add('hidden'); 
-        } catch {}
-      }
-    });
-
-    // ===== EVENT LISTENERS =====
-    document.addEventListener('DOMContentLoaded', () => {
-      debugLog('🎬 Application initialized');
-
-      // File input
-      document.getElementById('imageInput').addEventListener('change', (e) => {
-        const files = Array.from(e.target.files);
-        debugLog(`File input changed: ${files.length} files selected`);
-        
-        const newImages = files.filter(f => {
-          if (!f.type.startsWith('image/')) {
-            debugLog(`Rejected ${f.name}: not an image`, null, 'warning');
-            return false;
-          }
-          if (f.size > 10485760) {
-            debugLog(`Rejected ${f.name}: too large (${formatFileSize(f.size)})`, null, 'warning');
-            return false;
-          }
           return true;
-        });
-
-        if (newImages.length < files.length) {
-          showWarning(`Some files were skipped (must be images under 10MB)`);
         }
+      } catch (err) {
+        addResult(
+          'CDN Test', 
+          'fail', 
+          `Failed to access: ${new URL(cdn).hostname}`,
+          `Error: ${err.message}\nURL: ${cdn}`
+        );
+      }
+    }
 
-        images = newImages;
-        debugLog(`Accepted ${images.length} images`);
-        
-        updateImageList();
-        updateProcessButton();
-      });
+    addRecommendation('All CDN endpoints are inaccessible. This could be due to:<br>1. Network/firewall restrictions<br>2. Corporate proxy blocking CDNs<br>3. Offline/poor internet connection<br>4. DNS issues<br><br><strong>Solution:</strong> Download Tesseract.js and host it locally with your app.');
+    return false;
 
-      // Process button
-      document.getElementById('processBtn').addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent any default behavior
-        debugLog('Process button clicked');
-        processImages().catch(err => {
-          debugLog('Error in processImages', err, 'error');
-          showError(`Processing error: ${err.message}`);
-        });
-      });
+  } catch (err) {
+    addResult('CDN Access Test', 'fail', `Error testing CDN access: ${err.message}`, err.stack);
+    return false;
+  }
+}
 
-      // Cancel button
-      document.getElementById('cancelBtn').addEventListener('click', async (e) => {
-        e.preventDefault();
-        debugLog('Cancel button clicked');
-        abortProcessing = true;
-        showWarning('Cancelling processing...');
-        
-        try {
-          await releaseOcrWorker();
-        } catch (err) {
-          debugLog('Error releasing worker during cancel', err, 'warning');
-        }
-      });
+async function testWorkerSupport() {
+  addResult('Web Worker Support', 'pending', 'Checking browser support for Web Workers...', null);
 
-      // Debug toggle
-      document.getElementById('enableDebug').addEventListener('change', (e) => {
-        debugMode = e.target.checked;
-        debugLog(`Debug mode ${debugMode ? 'enabled' : 'disabled'}`);
-        
-        if (!debugMode) {
-          document.getElementById('debugPanel').classList.add('hidden');
-        }
-      });
+  try {
+    if (typeof Worker === 'undefined') {
+      addResult('Web Worker Support', 'fail', 'Web Workers are not supported in this environment', null);
+      addRecommendation('Your browser or environment does not support Web Workers, which are required for Tesseract.js. Try:<br>1. Using a modern browser (Chrome, Firefox, Safari, Edge)<br>2. Enabling JavaScript<br>3. Checking if you\'re in a restricted iframe');
+      return false;
+    }
 
-      updateProcessButton();
-      debugLog('✅ Event listeners attached');
+    // Try to create a simple worker
+    const blob = new Blob(['self.postMessage("test");'], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    const worker = new Worker(url);
+
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        worker.terminate();
+        addResult('Web Worker Support', 'fail', 'Worker created but timed out', null);
+        addRecommendation('Web Workers can be created but are timing out. This might be a security restriction.');
+        resolve(false);
+      }, 5000);
+
+      worker.onmessage = () => {
+        clearTimeout(timeout);
+        worker.terminate();
+        URL.revokeObjectURL(url);
+        addResult('Web Worker Support', 'pass', 'Web Workers are fully supported', null);
+        resolve(true);
+      };
+
+      worker.onerror = (err) => {
+        clearTimeout(timeout);
+        worker.terminate();
+        URL.revokeObjectURL(url);
+        addResult('Web Worker Support', 'fail', 'Worker creation failed', err.message);
+        addRecommendation('Web Worker creation failed. Check browser console for CSP (Content Security Policy) errors.');
+        resolve(false);
+      };
     });
+
+  } catch (err) {
+    addResult('Web Worker Support', 'fail', `Error: ${err.message}`, err.stack);
+    addRecommendation('Failed to test Web Worker support. This suggests a severe browser restriction or compatibility issue.');
+    return false;
+  }
+}
+
+async function testTesseractLoad() {
+  addResult('Tesseract.js Load Test', 'pending', 'Attempting to load Tesseract.js library...', null);
+
+  try {
+    // Check if already loaded
+    if (typeof Tesseract !== 'undefined') {
+      addResult('Tesseract.js Load Test', 'pass', 'Tesseract.js is already loaded', `Version: ${Tesseract.version || 'unknown'}`);
+      return true;
+    }
+
+    // Try to load dynamically
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js';
+    
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        addResult('Tesseract.js Load Test', 'fail', 'Script loading timed out after 30 seconds', null);
+        addRecommendation('Tesseract.js script is timing out. This indicates:<br>1. CDN is blocked<br>2. Script is too large for network<br>3. CSP is blocking script execution<br><br><strong>Solution:</strong> Host Tesseract.js locally.');
+        resolve(false);
+      }, 30000);
+
+      script.onload = () => {
+        clearTimeout(timeout);
+        if (typeof Tesseract !== 'undefined') {
+          addResult('Tesseract.js Load Test', 'pass', 'Tesseract.js loaded successfully', `Version: ${Tesseract.version || 'unknown'}`);
+          resolve(true);
+        } else {
+          addResult('Tesseract.js Load Test', 'fail', 'Script loaded but Tesseract object not found', 'The script loaded but did not define the global Tesseract object');
+          resolve(false);
+        }
+      };
+
+      script.onerror = (err) => {
+        clearTimeout(timeout);
+        addResult('Tesseract.js Load Test', 'fail', 'Failed to load script', err.message || 'Network error or CORS issue');
+        addRecommendation('Script loading failed. Check:<br>1. Network connectivity<br>2. CORS/CSP headers<br>3. Browser console for specific errors');
+        resolve(false);
+      };
+
+      document.head.appendChild(script);
+    });
+
+  } catch (err) {
+    addResult('Tesseract.js Load Test', 'fail', `Error: ${err.message}`, err.stack);
+    return false;
+  }
+}
+
+async function runAllDiagnostics() {
+  document.getElementById('diagnosticResults').innerHTML = '';
+  document.getElementById('recommendations').innerHTML = '';
+
+  addResult('Starting Diagnostics', 'pending', 'Running comprehensive system checks...', null);
+
+  const cdnOk = await testCDN();
+  const workerOk = await testWorkerSupport();
+  const tesseractOk = await testTesseractLoad();
+
+  // Summary
+  const allPassed = cdnOk && workerOk && tesseractOk;
+  
+  if (allPassed) {
+    addResult('✅ All Tests Passed', 'pass', 'Your environment should work with the OCR route generator!', null);
+    addRecommendation('All checks passed! If you\'re still experiencing issues:<br>1. Try the original route generator again<br>2. Clear browser cache<br>3. Check browser console for runtime errors<br>4. Ensure images are under 10MB and contain UK postcodes');
+  } else {
+    addResult('⚠️ Issues Detected', 'fail', 'Some tests failed. Review the recommendations above.', null);
+    
+    if (!cdnOk && !tesseractOk) {
+      addRecommendation('<strong>CRITICAL: CDN Access Blocked</strong><br>You need to download Tesseract.js and host it with your application. Steps:<br>1. Download from: https://github.com/naptha/tesseract.js/releases<br>2. Extract to your project folder<br>3. Update script src to local path<br>4. Also download worker and language files');
+    }
+  }
+}
+
+// UK Postcode validation and parsing (no OCR)
+const UK_POSTCODE_STRICT = /\b(GIR 0AA|[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})\b/i;
+
+function testManualParsing() {
+  const input = document.getElementById('manualInput').value;
+  const resultsDiv = document.getElementById('manualResults');
+  
+  if (!input.trim()) {
+    resultsDiv.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><span>Please enter some text with UK postcodes</span></div>';
+    return;
+  }
+
+  const lines = input.split('\n').filter(l => l.trim());
+  const matches = [];
+  const noMatches = [];
+
+  for (const line of lines) {
+    const match = line.match(UK_POSTCODE_STRICT);
+    if (match) {
+      matches.push({ line, postcode: match[0] });
+    } else {
+      noMatches.push(line);
+    }
+  }
+
+  let html = '<div style="margin-top:16px">';
+  
+  if (matches.length > 0) {
+    html += '<div class="alert alert-success"><span>✅</span><span>Found ' + matches.length + ' lines with UK postcodes</span></div>';
+    html += '<div class="diagnostic-result"><strong>Valid addresses:</strong><br>';
+    matches.forEach((m, i) => {
+      html += `<div style="margin:8px 0;padding:8px;background:#fff;border-radius:4px">${i + 1}. ${m.line} <span style="color:var(--success);font-weight:600">[${m.postcode}]</span></div>`;
+    });
+    html += '</div>';
+  }
+
+  if (noMatches.length > 0) {
+    html += '<div class="alert alert-warning"><span>⚠️</span><span>' + noMatches.length + ' lines without valid UK postcodes</span></div>';
+    html += '<div class="diagnostic-result"><strong>Invalid/missing postcodes:</strong><br>';
+    noMatches.forEach((line, i) => {
+      html += `<div style="margin:8px 0;padding:8px;background:#fff;border-radius:4px;color:var(--gray-600)">${i + 1}. ${line}</div>`;
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="alert alert-info"><span>ℹ️</span><span><strong>Note:</strong> This test only validates UK postcode format. The full app would extract these from images using OCR.</span></div>';
+  html += '</div>';
+
+  resultsDiv.innerHTML = html;
+}
+
+// Auto-run basic checks on load
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('Diagnostic tool loaded');
+  console.log('Tesseract available?', typeof Tesseract !== 'undefined');
+  console.log('Worker support?', typeof Worker !== 'undefined');
+});
+```
+
   </script>
+
+  <!-- Try to load Tesseract.js (may fail, which is what we're testing) -->
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js" onerror="console.error('Failed to load Tesseract.js from CDN')"></script>
+
 </body>
 </html>
