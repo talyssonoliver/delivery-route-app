@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>🧠 Ultra Robust Route Generator v3.2 (OCR + Safe Loop)</title>
+  <title>🧠 Ultra Robust Route Generator v3.3 (Fixed)</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
@@ -30,6 +30,7 @@
     .alert-warning{background:#fef5e7;border-left:4px solid var(--warning);color:#875a0f}
     .alert-error{background:#fee;border-left:4px solid var(--error);color:#742a2a}
     .alert-success{background:#e6fffa;border-left:4px solid var(--success);color:#234e52}
+    .alert-info{background:#ebf8ff;border-left:4px solid var(--primary);color:#2c5282}
     .progress{width:100%;height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden;margin:16px 0}
     .progress-bar{height:100%;background:linear-gradient(90deg,var(--primary) 0%,var(--secondary) 100%);transition:width .3s ease}
     .processing-stage{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:6px;margin-bottom:8px;font-size:13px}
@@ -52,6 +53,9 @@
     .hidden{display:none!important}
     .debug-panel{background:#1a202c;color:#48bb78;padding:16px;border-radius:8px;font-family:Monaco,monospace;font-size:11px;max-height:300px;overflow-y:auto;margin-top:16px}
     .debug-panel pre{white-space:pre-wrap;word-break:break-all}
+    .debug-panel .error{color:#fc8181}
+    .debug-panel .warning{color:#f6ad55}
+    .debug-panel .info{color:#63b3ed}
     .preview-canvas{max-width:100%;border:1px solid var(--gray-300);border-radius:8px;margin-top:12px}
     .feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
     .feature-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--gray-50);border-radius:6px;font-size:13px}
@@ -63,13 +67,15 @@
     .stat-card{background:var(--gray-50);padding:12px;border-radius:8px;text-align:center}
     .stat-value{font-size:24px;font-weight:700;color:var(--primary)}
     .stat-label{font-size:12px;color:var(--gray-600);margin-top:4px}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>🧠 Ultra Robust Route Generator <span class="version-badge">v3.2 OCR</span></h1>
-      <div class="subtitle">Client-side OCR (Tesseract.js) + multi-layer UK address normalisation with safe cancellation</div>
+      <h1>🧠 Ultra Robust Route Generator <span class="version-badge">v3.3 FIXED</span></h1>
+      <div class="subtitle">Client-side OCR (Tesseract.js) + multi-layer UK address normalisation with enhanced error handling</div>
       <div class="feature-list">
         <div class="feature-item"><span class="icon">🖼️</span><span>Advanced Image Pre-Processing</span></div>
         <div class="feature-item"><span class="icon">🔎</span><span>OCR (Tesseract.js)</span></div>
@@ -96,10 +102,10 @@
         </label>
       </div>
       <div class="checkbox-group">
-        <input type="checkbox" id="enableDebug" />
+        <input type="checkbox" id="enableDebug" checked />
         <label for="enableDebug">
           <strong>Show Debug Information</strong>
-          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Display all processing stages and OCR logs</div>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:4px;">Display all processing stages and OCR logs (recommended for troubleshooting)</div>
         </label>
       </div>
 
@@ -179,27 +185,40 @@
     let images = [];
     let isProcessing = false;
     let abortProcessing = false;
-    let debugMode = false;
+    let debugMode = true; // Default to true for troubleshooting
     let enablePreprocessing = true;
     let enableManualEdit = true;
     let extractedAddresses = [];
     let tesseractWorker = null;
+    let workerInitialized = false;
 
-    // ===== DEBUG =====
-    function escapeHtml(s){return s.replace(/[&<>"']/g,(m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
-    function debugLog(message, data = null) {
+    // ===== DEBUG UTILITIES =====
+    function escapeHtml(s){
+      if (typeof s !== 'string') return String(s);
+      return s.replace(/[&<>"']/g,(m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function debugLog(message, data = null, level = 'info') {
+      console.log(`[${level.toUpperCase()}] ${message}`, data || '');
+      
       if (!debugMode) return;
+      
       const panel = document.getElementById('debugPanel');
       if (!panel) return;
+      
       panel.classList.remove('hidden');
       const timestamp = new Date().toLocaleTimeString();
+      const levelClass = level === 'error' ? 'error' : level === 'warning' ? 'warning' : 'info';
+      
       if (data) {
-        panel.innerHTML += `<div>[${timestamp}] ${escapeHtml(message)}</div><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+        const dataStr = typeof data === 'object' ? JSON.stringify(data, null, 2) : String(data);
+        panel.innerHTML += `<div class="${levelClass}">[${timestamp}] ${escapeHtml(message)}</div><pre>${escapeHtml(dataStr)}</pre>`;
       } else {
-        panel.innerHTML += `<div>[${timestamp}] ${escapeHtml(message)}</div>`;
+        panel.innerHTML += `<div class="${levelClass}">[${timestamp}] ${escapeHtml(message)}</div>`;
       }
       panel.scrollTop = panel.scrollHeight;
     }
+
     function updateProcessingStage(stage, status) {
       const stageEl = document.getElementById(`stage-${stage}`);
       if (!stageEl) return;
@@ -211,6 +230,21 @@
         case 'error':      icon.textContent = '✗';  break;
         default:           icon.textContent = '○';
       }
+    }
+
+    // ===== TIMEOUT UTILITY =====
+    function withTimeout(promise, ms, label='Operation') {
+      let timeoutId;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(`${label} timed out after ${ms}ms`));
+        }, ms);
+      });
+      
+      return Promise.race([
+        promise.finally(() => clearTimeout(timeoutId)),
+        timeoutPromise
+      ]);
     }
 
     // ===== POSTCODES + RULES =====
@@ -237,6 +271,7 @@
         .replace(/\s{2,}/g, ' ')
         .trim();
     }
+
     function stripMetadata(line) {
       let s = line;
       for (const kw of IGNORE_TOKENS) {
@@ -252,15 +287,21 @@
       s = s.replace(/[|]/g,' ').replace(/\s{2,}/g,' ').replace(/\s*,\s*,+/g, ',').trim();
       return fixOcrArtifacts(s);
     }
+
     const NAME_PREFIX = /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sir|Lady|Lord)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?[, ]*/g;
     const ALLCAPS_NAME_AT_START = /^[A-Z]{2,}(?:\s+[A-Z]{2,}){0,2}\s*,\s*/;
-    function removePersonalNames(s) { return s.replace(NAME_PREFIX,'').replace(ALLCAPS_NAME_AT_START,'').trim(); }
+
+    function removePersonalNames(s) { 
+      return s.replace(NAME_PREFIX,'').replace(ALLCAPS_NAME_AT_START,'').trim(); 
+    }
+
     function normaliseAddressParts(parts) {
       const kept = parts
         .map(p=>p.trim())
         .filter(p => p && (THOROUGHFARES.test(p) || UNIT_HINTS.test(p) || AREAS.test(p) || /\d+[A-Z]?/i.test(p)));
       return Array.from(new Set(kept)).join(', ').replace(/\s*,\s*/g, ', ');
     }
+
     function reconstructFromLine(line) {
       const fixed = removePersonalNames(stripMetadata(line));
       const m = fixed.match(UK_POSTCODE_STRICT);
@@ -274,9 +315,10 @@
       const final = `${addr}, ${pc} GB`.replace(/\s{2,}/g,' ').trim();
       return final.length > 10 ? final : null;
     }
+
     function parseOcrToAddresses(text) {
       updateProcessingStage(2, 'processing');
-      debugLog('🔍 Layer 2: parse OCR text');
+      debugLog('🔍 Layer 2: Parsing OCR text to addresses');
       const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
       const out = [];
       let n = 1;
@@ -286,92 +328,136 @@
         if (addr) out.push({ num: n++, address: addr });
       }
       updateProcessingStage(2, out.length ? 'complete' : 'error');
+      debugLog(`✅ Layer 2: Extracted ${out.length} potential addresses`);
       return out;
     }
+
     function validateAndCleanAddresses(addresses) {
       updateProcessingStage(3, 'processing');
       debugLog(`🔧 Layer 3-6: Deep cleaning ${addresses.length} addresses...`);
       const valid = [];
       const invalid = [];
+      
       for (const item of addresses) {
         let address = typeof item === 'string' ? item : item.address;
         if (typeof address !== 'string') continue;
+        
         address = fixOcrArtifacts(address);
         const pcMatch = address.match(UK_POSTCODE_STRICT);
+        
         if (!pcMatch) {
           const recon = reconstructFromLine(address);
-          if (recon) address = recon; else { invalid.push(address); continue; }
+          if (recon) address = recon; 
+          else { 
+            invalid.push(address); 
+            debugLog(`❌ Invalid (no postcode): ${address}`, null, 'warning');
+            continue; 
+          }
         }
+        
         if (!/\b(GB|UK)\b$/i.test(address)) address += ' GB';
-        address = address.replace(/\b(Deadline|Service Level|Del Weight|Del Items|Ref):[^,]*/gi,'')
-                         .replace(/\|\s*/g,'')
-                         .replace(/\s+/g,' ')
-                         .trim();
+        
+        address = address
+          .replace(/\b(Deadline|Service Level|Del Weight|Del Items|Ref):[^,]*/gi,'')
+          .replace(/\|\s*/g,'')
+          .replace(/\s+/g,' ')
+          .trim();
+        
         if (address.length > 15 && UK_POSTCODE_STRICT.test(address)) {
           valid.push({ num: item.num || (valid.length + 1), address });
           debugLog(`✅ Valid: ${address}`);
         } else {
           invalid.push(address);
-          debugLog(`❌ Invalid: ${address}`);
+          debugLog(`❌ Invalid (too short or malformed): ${address}`, null, 'warning');
         }
       }
-      const seen = new Set(); const dedup = [];
+      
+      const seen = new Set(); 
+      const dedup = [];
       for (const a of valid) {
         const key = a.address.toUpperCase();
-        if (!seen.has(key)) { seen.add(key); dedup.push(a); }
+        if (!seen.has(key)) { 
+          seen.add(key); 
+          dedup.push(a); 
+        }
       }
+      
       updateProcessingStage(3, 'complete');
+      debugLog(`✅ Layer 3-6: ${dedup.length} valid unique addresses, ${invalid.length} invalid`);
       return { valid: dedup, invalid };
     }
 
-    // ===== UTILS =====
-    function withTimeout(promise, ms, label='timeout') {
-      let t; const timer = new Promise((_, rej) => t = setTimeout(() => rej(new Error(label)), ms));
-      return Promise.race([promise.finally(() => clearTimeout(t)), timer]);
-    }
-
     // ===== IMAGE PRE-PROCESS =====
-    async function preprocessImage(file, produceBase64 = false) {
+    async function preprocessImage(file) {
       return new Promise((resolve, reject) => {
         const img = new Image();
         const reader = new FileReader();
+        
+        reader.onerror = (err) => {
+          debugLog(`❌ FileReader error for ${file.name}`, err, 'error');
+          reject(new Error(`Failed to read file: ${file.name}`));
+        };
+        
         reader.onload = (e) => {
+          img.onerror = (err) => {
+            debugLog(`❌ Image load error for ${file.name}`, err, 'error');
+            reject(new Error(`Failed to load image: ${file.name}`));
+          };
+          
           img.onload = () => {
             try {
               const canvas = document.getElementById('previewCanvas');
+              if (!canvas) {
+                throw new Error('Canvas element not found');
+              }
+              
               const ctx = canvas.getContext('2d', { willReadFrequently: true });
+              if (!ctx) {
+                throw new Error('Failed to get canvas context');
+              }
 
-              // Smaller limits for faster OCR
+              // Reasonable size limits for OCR performance
               const MAX_W = 1400, MAX_H = 2000;
               let w = img.width, h = img.height;
               const r = Math.min(1, MAX_W / w, MAX_H / h);
               canvas.width = Math.round(w * r);
               canvas.height = Math.round(h * r);
+              
               ctx.imageSmoothingEnabled = true;
               ctx.imageSmoothingQuality = 'high';
               ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              if (!enablePreprocessing) {
+                debugLog(`📸 Basic processing only: ${file.name}`);
+                canvas.classList.remove('hidden');
+                resolve();
+                return;
+              }
 
               // Get image data
               const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
               const data = imageData.data;
 
-              debugLog('📸 Advanced pre-processing: ' + file.name);
+              debugLog(`📸 Advanced pre-processing: ${file.name} (${canvas.width}x${canvas.height})`);
 
               // 1) Greyscale
               for (let i = 0; i < data.length; i += 4) {
                 const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
                 data[i] = data[i + 1] = data[i + 2] = gray;
               }
-              // 2) Contrast
+              
+              // 2) Contrast enhancement
               const cf = 1.5;
               for (let i = 0; i < data.length; i += 4) {
                 const v = Math.min(255, Math.max(0, (data[i] - 128) * cf + 128));
                 data[i] = data[i + 1] = data[i + 2] = v;
               }
+              
               // 3) Sharpen
               const width = canvas.width, height = canvas.height;
               const kernel = [0,-1,0,-1,5,-1,0,-1,0];
               const out = new Uint8ClampedArray(data);
+              
               for (let y = 1; y < height - 1; y++) {
                 for (let x = 1; x < width - 1; x++) {
                   let sum = 0;
@@ -386,106 +472,223 @@
                   out[idx] = out[idx + 1] = out[idx + 2] = Math.min(255, Math.max(0, sum));
                 }
               }
+              
               // 4) Threshold
               const threshold = 180;
               for (let i = 0; i < out.length; i += 4) {
                 const v = out[i] > threshold ? 255 : out[i] < 60 ? 0 : out[i];
                 out[i] = out[i + 1] = out[i + 2] = v;
               }
+              
               ctx.putImageData(new ImageData(out, width, height), 0, 0);
-
-              // Optional downscale after threshold to reduce OCR load
-              if (canvas.width > 1200) {
-                const tmp = document.createElement('canvas');
-                tmp.width = Math.round(canvas.width * 0.9);
-                tmp.height = Math.round(canvas.height * 0.9);
-                const tctx = tmp.getContext('2d');
-                tctx.drawImage(canvas, 0, 0, tmp.width, tmp.height);
-                canvas.width = tmp.width; canvas.height = tmp.height;
-                const c = canvas.getContext('2d');
-                c.drawImage(tmp, 0, 0);
-              }
-
-              if (document.getElementById('enablePreprocessing').checked) {
-                canvas.classList.remove('hidden');
-              }
-
-              if (!produceBase64) { resolve(null); return; }
-              canvas.toBlob((blob) => {
-                const processedReader = new FileReader();
-                processedReader.onload = () => resolve(processedReader.result.split(',')[1]);
-                processedReader.onerror = reject;
-                processedReader.readAsDataURL(blob);
-              }, 'image/jpeg', 0.78);
+              canvas.classList.remove('hidden');
+              
+              debugLog(`✅ Pre-processing complete: ${file.name}`);
+              resolve();
             } catch (err) {
-              debugLog('❌ Pre-processing error: ' + err.message);
+              debugLog(`❌ Pre-processing error for ${file.name}`, err, 'error');
               reject(err);
             }
           };
-          img.onerror = reject;
+          
           img.src = e.target.result;
         };
-        reader.onerror = reject;
+        
         reader.readAsDataURL(file);
       });
     }
 
-    // ===== OCR WORKER + SAFE RECOGNITION =====
-    async function getOcrWorker() {
-      if (tesseractWorker) return tesseractWorker;
-      tesseractWorker = await Tesseract.createWorker({ logger: (m) => debugMode && debugLog(`🧩 OCR: ${m.status || ''} ${Math.round((m.progress || 0)*100)}%`) });
-      await tesseractWorker.load();
-      await tesseractWorker.loadLanguage('eng');
-      await tesseractWorker.initialize('eng');
-      await tesseractWorker.setParameters({
-        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-        tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.-:/#()[]|&'\""
-      });
-      return tesseractWorker;
+    // ===== OCR WORKER WITH ROBUST ERROR HANDLING =====
+    async function initializeOcrWorker() {
+      if (workerInitialized && tesseractWorker) {
+        debugLog('✅ OCR worker already initialized');
+        return tesseractWorker;
+      }
+
+      debugLog('🔧 Initializing OCR worker...');
+      
+      try {
+        // Check if Tesseract is loaded
+        if (typeof Tesseract === 'undefined') {
+          throw new Error('Tesseract.js library not loaded. Check your internet connection.');
+        }
+
+        // Create worker with timeout
+        tesseractWorker = await withTimeout(
+          Tesseract.createWorker({ 
+            logger: (m) => {
+              if (debugMode && m.status) {
+                const progress = Math.round((m.progress || 0) * 100);
+                debugLog(`🧩 OCR Worker: ${m.status} ${progress}%`);
+              }
+            }
+          }),
+          30000,
+          'Worker creation'
+        );
+        
+        debugLog('✅ Worker created, loading language...');
+        
+        await withTimeout(tesseractWorker.load(), 20000, 'Worker load');
+        debugLog('✅ Worker loaded, initializing language...');
+        
+        await withTimeout(tesseractWorker.loadLanguage('eng'), 20000, 'Language load');
+        debugLog('✅ Language loaded, initializing...');
+        
+        await withTimeout(tesseractWorker.initialize('eng'), 20000, 'Worker initialize');
+        debugLog('✅ Worker initialized, setting parameters...');
+        
+        await withTimeout(
+          tesseractWorker.setParameters({
+            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+            tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.-:/#()[]|&'\""
+          }),
+          10000,
+          'Set parameters'
+        );
+        
+        workerInitialized = true;
+        debugLog('✅ OCR worker fully initialized and ready!');
+        return tesseractWorker;
+        
+      } catch (error) {
+        debugLog(`❌ OCR worker initialization failed: ${error.message}`, error, 'error');
+        
+        // Clean up failed worker
+        if (tesseractWorker) {
+          try {
+            await tesseractWorker.terminate();
+          } catch (e) {
+            debugLog('Failed to terminate worker after error', e, 'warning');
+          }
+          tesseractWorker = null;
+        }
+        workerInitialized = false;
+        
+        throw new Error(
+          `Failed to initialize OCR engine: ${error.message}\n\n` +
+          'Troubleshooting:\n' +
+          '1. Check your internet connection\n' +
+          '2. Ensure Tesseract.js CDN is accessible\n' +
+          '3. Try refreshing the page\n' +
+          '4. Check browser console for detailed errors'
+        );
+      }
     }
+
     async function releaseOcrWorker() {
       if (tesseractWorker) {
-        try { await tesseractWorker.terminate(); } catch {}
-        tesseractWorker = null;
+        try {
+          debugLog('🔧 Terminating OCR worker...');
+          await withTimeout(tesseractWorker.terminate(), 5000, 'Worker termination');
+          debugLog('✅ OCR worker terminated');
+        } catch (e) {
+          debugLog('⚠️ Error terminating worker', e, 'warning');
+        } finally {
+          tesseractWorker = null;
+          workerInitialized = false;
+        }
       }
     }
-    async function recognizeWithTimeout(canvas, msPrimary = 25000, msFallback = 20000) {
-      const worker = await getOcrWorker();
+
+    async function recognizeWithTimeout(canvas, msPrimary = 30000, msFallback = 25000) {
+      if (!tesseractWorker || !workerInitialized) {
+        throw new Error('OCR worker not initialized');
+      }
+
       try {
-        await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK });
-        return await withTimeout(worker.recognize(canvas), msPrimary, 'OCR_TIMEOUT_PRIMARY');
+        debugLog('🧠 Starting OCR recognition (primary mode)...');
+        await tesseractWorker.setParameters({ 
+          tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK 
+        });
+        
+        const result = await withTimeout(
+          tesseractWorker.recognize(canvas), 
+          msPrimary, 
+          'OCR recognition (primary)'
+        );
+        
+        debugLog('✅ OCR recognition successful (primary mode)');
+        return result;
+        
       } catch (e) {
-        debugLog(`⚠️ Primary OCR failed: ${e.message || e}`);
-        await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.AUTO_SPARSE_TEXT });
-        return await withTimeout(worker.recognize(canvas), msFallback, 'OCR_TIMEOUT_FALLBACK');
+        debugLog(`⚠️ Primary OCR failed: ${e.message}. Trying fallback mode...`, null, 'warning');
+        
+        try {
+          await tesseractWorker.setParameters({ 
+            tessedit_pageseg_mode: Tesseract.PSM.AUTO 
+          });
+          
+          const result = await withTimeout(
+            tesseractWorker.recognize(canvas), 
+            msFallback, 
+            'OCR recognition (fallback)'
+          );
+          
+          debugLog('✅ OCR recognition successful (fallback mode)');
+          return result;
+          
+        } catch (fallbackError) {
+          debugLog(`❌ Both OCR modes failed`, fallbackError, 'error');
+          throw new Error(`OCR failed: ${fallbackError.message}`);
+        }
       }
     }
-    async function processWithOCRFromCanvas(canvas, filename) {
+
+    async function processWithOCR(canvas, filename) {
       updateProcessingStage(1, 'processing');
-      debugLog('🧠 Layer 1: OCR start', { filename });
+      debugLog(`🧠 Layer 1: Starting OCR for ${filename}`);
+      
       try {
         const { data } = await recognizeWithTimeout(canvas);
+        const text = data.text || '';
+        
         updateProcessingStage(1, 'complete');
-        debugLog('✅ Layer 1: OCR done', { length: (data.text || '').length });
-        return data.text || '';
+        debugLog(`✅ Layer 1: OCR complete - ${text.length} characters extracted`);
+        
+        if (text.length < 10) {
+          debugLog('⚠️ OCR extracted very little text', null, 'warning');
+        }
+        
+        return text;
+        
       } catch (err) {
         updateProcessingStage(1, 'error');
-        debugLog('❌ Layer 1 failed: ' + (err.message || err));
-        throw err;
+        debugLog(`❌ Layer 1 OCR failed: ${err.message}`, err, 'error');
+        throw new Error(`OCR processing failed for ${filename}: ${err.message}`);
       }
     }
 
-    // ===== MAIN =====
+    // ===== MAIN PROCESSING =====
     async function processImages() {
-      if (images.length === 0) { showError('Please upload at least one image'); return; }
+      // Validation
+      if (images.length === 0) { 
+        showError('Please upload at least one image'); 
+        return; 
+      }
 
+      // Prevent double-processing
+      if (isProcessing) {
+        debugLog('⚠️ Already processing, ignoring duplicate call', null, 'warning');
+        return;
+      }
+
+      debugLog('\n='.repeat(50));
+      debugLog('🚀 STARTING NEW PROCESSING SESSION');
+      debugLog('='.repeat(50));
+
+      // Initialize state
       abortProcessing = false;
       isProcessing = true;
       enablePreprocessing = document.getElementById('enablePreprocessing').checked;
       enableManualEdit = document.getElementById('enableManualEdit').checked;
       debugMode = document.getElementById('enableDebug').checked;
+      
+      debugLog(`Configuration: preprocess=${enablePreprocessing}, manualEdit=${enableManualEdit}, debug=${debugMode}`);
+      
       updateProcessButton();
 
+      // Reset UI
       document.getElementById('errorSection').classList.add('hidden');
       document.getElementById('resultsSection').classList.add('hidden');
       document.getElementById('extractedSection').classList.add('hidden');
@@ -493,16 +696,14 @@
       document.getElementById('progressSection').classList.remove('hidden');
       document.getElementById('debugPanel').innerHTML = '';
 
+      // Setup stages
       const stagesHtml = `
+        <div id="stage-init" class="processing-stage pending"><div class="icon">○</div><div>Initializing OCR Engine</div></div>
         <div id="stage-0" class="processing-stage pending"><div class="icon">○</div><div>Layer 0: Image Pre-Processing</div></div>
         <div id="stage-1" class="processing-stage pending"><div class="icon">○</div><div>Layer 1: OCR Extraction</div></div>
         <div id="stage-2" class="processing-stage pending"><div class="icon">○</div><div>Layer 2: Parse & Reconstruct</div></div>
         <div id="stage-3" class="processing-stage pending"><div class="icon">○</div><div>Layer 3-6: Cleaning & Validation</div></div>`;
       document.getElementById('processingStages').innerHTML = stagesHtml;
-
-      debugLog('🚀 Starting 7-layer processing...');
-      debugLog(`Pre-processing: ${enablePreprocessing ? 'ENABLED' : 'DISABLED'}`);
-      debugLog(`Manual editing: ${enableManualEdit ? 'ENABLED' : 'DISABLED'}`);
 
       const allAddresses = [];
       const allInvalid = [];
@@ -510,130 +711,241 @@
       let processedSuccessfully = 0;
 
       try {
-        await getOcrWorker();
+        // Initialize OCR worker first
+        updateProcessingStage('init', 'processing');
+        document.getElementById('progressText').textContent = 'Initializing OCR engine...';
+        
+        await initializeOcrWorker();
+        updateProcessingStage('init', 'complete');
 
+        if (abortProcessing) {
+          debugLog('⛔ Processing cancelled during initialization');
+          throw new Error('Processing cancelled by user');
+        }
+
+        // Process each image
         for (let i = 0; i < images.length; i++) {
-          if (abortProcessing) { debugLog('⛔ Aborted by user'); break; }
+          if (abortProcessing) { 
+            debugLog('⛔ Processing cancelled by user'); 
+            break; 
+          }
 
           const progress = ((i + 1) / images.length) * 100;
           document.getElementById('progressBar').style.width = progress + '%';
-          document.getElementById('progressText').textContent = `Processing image ${i + 1}/${images.length}... (${images[i].name})`;
-          debugLog(`\n📸 IMAGE ${i + 1}/${images.length}: ${images[i].name}`);
+          document.getElementById('progressText').textContent = 
+            `Processing image ${i + 1}/${images.length}: ${images[i].name}`;
+
+          debugLog(`\n${'='.repeat(40)}`);
+          debugLog(`📸 IMAGE ${i + 1}/${images.length}: ${images[i].name}`);
+          debugLog(`${'='.repeat(40)}`);
 
           try {
+            // Pre-process image
             if (enablePreprocessing) updateProcessingStage(0, 'processing');
-            await preprocessImage(images[i], false);
+            await preprocessImage(images[i]);
             if (enablePreprocessing) updateProcessingStage(0, 'complete');
 
-            if (abortProcessing) { debugLog('⛔ Aborted post-preprocess'); break; }
+            if (abortProcessing) break;
 
+            // Run OCR
             const canvas = document.getElementById('previewCanvas');
-            const ocrText = await processWithOCRFromCanvas(canvas, images[i].name);
+            if (!canvas) {
+              throw new Error('Canvas element not found');
+            }
+            
+            const ocrText = await processWithOCR(canvas, images[i].name);
 
-            if (abortProcessing) { debugLog('⛔ Aborted post-OCR'); break; }
+            if (abortProcessing) break;
 
+            // Parse addresses
             const parsed = parseOcrToAddresses(ocrText);
+            debugLog(`Parsed ${parsed.length} potential addresses from OCR text`);
+
+            // Validate and clean
             const { valid, invalid } = validateAndCleanAddresses(parsed);
 
             if (valid.length > 0) {
               allAddresses.push(...valid);
               processedSuccessfully++;
-              debugLog(`✅ Image ${i + 1}: ${valid.length} valid addresses`);
+              debugLog(`✅ Image ${i + 1}: Extracted ${valid.length} valid addresses`);
             }
+            
             if (invalid.length > 0) {
               allInvalid.push(...invalid);
-              debugLog(`⚠️ Image ${i + 1}: ${invalid.length} invalid/skipped`);
+              debugLog(`⚠️ Image ${i + 1}: ${invalid.length} addresses were invalid/skipped`, null, 'warning');
             }
-            if (valid.length === 0 && invalid.length === 0) {
+            
+            if (valid.length === 0 && parsed.length === 0) {
               failedImages++;
-              debugLog(`❌ Image ${i + 1}: No addresses found`);
+              debugLog(`❌ Image ${i + 1}: No addresses found`, null, 'error');
             }
+
           } catch (imgError) {
             failedImages++;
-            debugLog(`❌ Image ${i + 1} error: ${imgError.message || imgError}`);
+            debugLog(`❌ Image ${i + 1} processing error: ${imgError.message}`, imgError, 'error');
+            
+            // Continue with next image instead of stopping completely
+            showWarning(`Failed to process ${images[i].name}: ${imgError.message}`);
           }
 
-          await new Promise(r => setTimeout(r, 200));
+          // Small delay between images to prevent UI freezing
+          await new Promise(r => setTimeout(r, 100));
         }
 
-        debugLog('\n🔄 Final processing...');
+        if (abortProcessing) {
+          throw new Error('Processing cancelled by user');
+        }
 
+        debugLog('\n' + '='.repeat(50));
+        debugLog('🏁 PROCESSING COMPLETE');
+        debugLog('='.repeat(50));
+
+        // Deduplicate and finalize
         const uniqueAddresses = allAddresses
-          .filter((addr, index, self) => index === self.findIndex(a => a.address === addr.address))
+          .filter((addr, index, self) => 
+            index === self.findIndex(a => a.address === addr.address))
           .sort((a, b) => a.num - b.num);
 
-        debugLog(`✅ Final: ${uniqueAddresses.length} unique addresses`);
+        debugLog(`Final results: ${uniqueAddresses.length} unique valid addresses`);
+        debugLog(`Total extracted: ${allAddresses.length}, Invalid: ${allInvalid.length}, Failed images: ${failedImages}`);
 
+        // Update stats
         document.getElementById('totalExtracted').textContent = allAddresses.length.toString();
         document.getElementById('validAddresses').textContent = uniqueAddresses.length.toString();
         document.getElementById('invalidAddresses').textContent = allInvalid.length.toString();
 
         extractedAddresses = uniqueAddresses;
 
-        if (!abortProcessing && uniqueAddresses.length > 0) {
+        if (uniqueAddresses.length > 0) {
           document.getElementById('extractedSection').classList.remove('hidden');
           const editor = document.getElementById('addressEditor');
           editor.value = uniqueAddresses.map(a => a.address).join('\n');
-          if (!enableManualEdit) generateRoutes();
-        } else if (!abortProcessing) {
+          
+          if (!enableManualEdit) {
+            debugLog('Auto-generating routes (manual edit disabled)');
+            generateRoutes();
+          } else {
+            debugLog('Manual editing enabled - waiting for user to review addresses');
+          }
+        } else {
           throw new Error(
             `❌ No valid addresses extracted from ${images.length} image(s).\n\n` +
+            `Results:\n` +
+            `• Successfully processed: ${processedSuccessfully}/${images.length} images\n` +
+            `• Failed images: ${failedImages}\n` +
+            `• Invalid addresses found: ${allInvalid.length}\n\n` +
             `Troubleshooting:\n` +
-            `1. Ensure images are clear UK delivery run sheets\n` +
-            `2. Check that UK postcodes are visible (e.g., HA6 2WQ)\n` +
-            `3. Enable Image Pre-Processing\n` +
-            `4. Check Debug Information for details\n\n` +
-            `Processed: ${processedSuccessfully}/${images.length} images\n` +
-            `Invalid addresses: ${allInvalid.length}`
+            `1. Ensure images contain clear UK delivery addresses\n` +
+            `2. Check that UK postcodes are visible (e.g., HA6 2WQ, SW1A 1AA)\n` +
+            `3. Enable "Advanced Image Pre-Processing" if disabled\n` +
+            `4. Review Debug Information above for details\n` +
+            `5. Try higher resolution images if text is unclear`
           );
         }
+
         if (failedImages > 0) {
-          showWarning(`⚠️ ${failedImages}/${images.length} images failed or had no valid addresses`);
+          showWarning(`⚠️ ${failedImages} out of ${images.length} images failed to process. Check debug log for details.`);
         }
+
       } catch (err) {
-        debugLog(`\n❌ FATAL ERROR: ${err.message || err}`);
-        showError(err.message || String(err));
-        for (let i = 0; i <= 5; i++) updateProcessingStage(i, 'error');
+        debugLog(`\n❌❌❌ FATAL ERROR ❌❌❌`, err, 'error');
+        debugLog(`Error message: ${err.message}`);
+        debugLog(`Error stack: ${err.stack}`);
+        
+        showError(err.message || 'An unexpected error occurred during processing');
+        
+        // Mark all stages as error
+        ['init', 0, 1, 2, 3].forEach(stage => updateProcessingStage(stage, 'error'));
+        
       } finally {
-        try { await releaseOcrWorker(); } catch {}
+        // Cleanup
+        try {
+          await releaseOcrWorker();
+        } catch (e) {
+          debugLog('Error during cleanup', e, 'warning');
+        }
+        
         isProcessing = false;
+        abortProcessing = false;
         updateProcessButton();
-        document.getElementById('progressSection').classList.add('hidden');
+        
+        // Hide progress section after a short delay if we have results
+        if (extractedAddresses.length > 0) {
+          setTimeout(() => {
+            document.getElementById('progressSection').classList.add('hidden');
+          }, 1000);
+        }
+        
+        debugLog('\n' + '='.repeat(50));
+        debugLog('🏁 SESSION COMPLETE');
+        debugLog('='.repeat(50) + '\n');
       }
     }
 
+    // ===== ROUTE GENERATION =====
     function generateRoutes() {
+      debugLog('📍 Generating routes...');
+      
       const editor = document.getElementById('addressEditor');
-      const addresses = editor.value.split('\n').map(a=>a.trim()).filter(Boolean);
-      if (addresses.length === 0) { showError('No addresses to generate routes'); return; }
+      const addresses = editor.value
+        .split('\n')
+        .map(a => a.trim())
+        .filter(Boolean);
+
+      if (addresses.length === 0) { 
+        showError('No addresses available to generate routes'); 
+        return; 
+      }
+
+      debugLog(`Generating routes for ${addresses.length} addresses`);
+
       const groups = [];
       const maxStopsPerGroup = 14;
+
       for (let i = 0; i < addresses.length; i += maxStopsPerGroup) {
         const group = addresses.slice(i, Math.min(i + maxStopsPerGroup, addresses.length));
         const destinations = group.map(addr => encodeURIComponent(addr)).join('&daddr=');
+        
         groups.push({
           id: Math.floor(i / maxStopsPerGroup) + 1,
           startStop: i + 1,
           endStop: Math.min(i + maxStopsPerGroup, addresses.length),
           count: group.length,
-          stops: group.map((addr, idx) => ({ num: i + idx + 1, address: addr })),
+          stops: group.map((addr, idx) => ({ 
+            num: i + idx + 1, 
+            address: addr 
+          })),
           link: `https://maps.apple.com/?daddr=${destinations}`
         });
       }
+
+      debugLog(`✅ Generated ${groups.length} route(s)`);
       displayResults(groups, addresses.length);
     }
-    function reprocessImages(){ processImages(); }
 
-    // ===== UI =====
+    function reprocessImages() { 
+      debugLog('🔄 Reprocessing images...');
+      processImages(); 
+    }
+
+    // ===== UI FUNCTIONS =====
     function updateImageList() {
       const listDiv = document.getElementById('imageList');
       const previewCanvas = document.getElementById('previewCanvas');
-      if (images.length === 0) { listDiv.innerHTML = ''; previewCanvas.classList.add('hidden'); return; }
+      
+      if (images.length === 0) { 
+        listDiv.innerHTML = ''; 
+        previewCanvas.classList.add('hidden'); 
+        return; 
+      }
+
       const header = document.createElement('div');
       header.style.cssText = 'color: var(--success); font-size: 14px; margin-bottom: 12px; font-weight: 600;';
       header.textContent = `✓ ${images.length} image(s) selected`;
+      
       listDiv.innerHTML = '';
       listDiv.appendChild(header);
+
       images.forEach((img, idx) => {
         const item = document.createElement('div');
         item.className = 'image-item';
@@ -644,23 +956,46 @@
         listDiv.appendChild(item);
       });
     }
-    function formatFileSize(bytes){ if(bytes<1024)return bytes+' B'; if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB'; return (bytes/(1024*1024)).toFixed(1)+' MB'; }
-    function removeImage(idx){ images.splice(idx,1); updateImageList(); updateProcessButton(); }
-    function updateProcessButton(){
+
+    function formatFileSize(bytes) { 
+      if (bytes < 1024) return bytes + ' B'; 
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'; 
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB'; 
+    }
+
+    function removeImage(idx) { 
+      debugLog(`Removing image: ${images[idx].name}`);
+      images.splice(idx, 1); 
+      updateImageList(); 
+      updateProcessButton(); 
+    }
+
+    function updateProcessButton() {
       const btn = document.getElementById('processBtn');
       const cancel = document.getElementById('cancelBtn');
+      
       btn.disabled = !(images.length > 0 && !isProcessing);
       cancel.disabled = !isProcessing;
-      btn.textContent = isProcessing ? '⏳ Processing…' : '🧠 Process with Ultra Robust AI (7 Layers)';
+      
+      if (isProcessing) {
+        btn.innerHTML = '<span class="spinner"></span> Processing…';
+      } else {
+        btn.textContent = '🧠 Process with Ultra Robust AI (7 Layers)';
+      }
     }
+
     function displayResults(groups, totalStops) {
+      debugLog('📊 Displaying results');
+      
       document.getElementById('resultsTitle').innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span>✓ ${totalStops} Deliveries Ready</span>
           <span style="font-size:14px;color:var(--gray-600)">${groups.length} route(s) generated</span>
         </div>`;
+
       const list = document.getElementById('routesList');
       list.innerHTML = '';
+
       groups.forEach(g => {
         const card = document.createElement('div');
         card.className = 'route-card';
@@ -677,77 +1012,191 @@
           <button class="btn btn-secondary" onclick="copyAddresses(${g.id})">📄 Copy All Addresses</button>
           <div class="show-addresses" onclick="toggleAddresses(this)">▼ Show ${g.count} addresses</div>
           <div class="address-list" id="addresses-${g.id}">
-            ${g.stops.map(s=>`
-              <div class="address-item"><span class="stop-num">${s.num}.</span>${escapeHtml(s.address)}</div>
+            ${g.stops.map(s => `
+              <div class="address-item">
+                <span class="stop-num">${s.num}.</span>${escapeHtml(s.address)}
+              </div>
             `).join('')}
           </div>`;
         list.appendChild(card);
       });
+
       document.getElementById('resultsSection').classList.remove('hidden');
       document.getElementById('extractedSection').classList.add('hidden');
-      setTimeout(()=>document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'}),100);
+      
+      setTimeout(() => {
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
-    function toggleAddresses(el){
+
+    function toggleAddresses(el) {
       const list = el.nextElementSibling;
-      if (list.style.display === 'block'){ list.style.display='none'; el.textContent = el.textContent.replace('▲','▼'); }
-      else { list.style.display='block'; el.textContent = el.textContent.replace('▼','▲'); }
+      if (list.style.display === 'block') { 
+        list.style.display = 'none'; 
+        el.textContent = el.textContent.replace('▲', '▼'); 
+      } else { 
+        list.style.display = 'block'; 
+        el.textContent = el.textContent.replace('▼', '▲'); 
+      }
     }
-    function copyLink(link){
-      navigator.clipboard.writeText(link).then(()=>showSuccess('✓ Route link copied to clipboard')).catch(()=>showError('❌ Failed to copy link'));
+
+    function copyLink(link) {
+      navigator.clipboard.writeText(link)
+        .then(() => showSuccess('✓ Route link copied to clipboard'))
+        .catch(() => showError('❌ Failed to copy link'));
     }
-    function copyAddresses(groupId){
+
+    function copyAddresses(groupId) {
       const addressList = document.getElementById(`addresses-${groupId}`);
-      const addresses = Array.from(addressList.querySelectorAll('.address-item')).map(item=>item.textContent.trim()).join('\n');
-      navigator.clipboard.writeText(addresses).then(()=>showSuccess('✓ All addresses copied to clipboard')).catch(()=>showError('❌ Failed to copy addresses'));
+      const addresses = Array.from(addressList.querySelectorAll('.address-item'))
+        .map(item => item.textContent.trim())
+        .join('\n');
+      
+      navigator.clipboard.writeText(addresses)
+        .then(() => showSuccess('✓ All addresses copied to clipboard'))
+        .catch(() => showError('❌ Failed to copy addresses'));
     }
-    function showError(message){
+
+    function showError(message) {
+      debugLog(`Showing error to user: ${message}`, null, 'error');
+      
       const errorSection = document.getElementById('errorSection');
-      document.getElementById('errorText').innerHTML = escapeHtml(message).replace(/\n/g,'<br>');
+      document.getElementById('errorText').innerHTML = escapeHtml(message).replace(/\n/g, '<br>');
       errorSection.classList.remove('hidden');
-      setTimeout(()=>errorSection.scrollIntoView({behavior:'smooth'}),100);
+      
+      setTimeout(() => {
+        errorSection.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
-    function showSuccess(message){
+
+    function showSuccess(message) {
       const alert = document.createElement('div');
       alert.className = 'alert alert-success';
       alert.innerHTML = `<span>✓</span><span>${escapeHtml(message)}</span>`;
-      alert.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:250px';
+      alert.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:250px;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
       document.body.appendChild(alert);
-      setTimeout(()=>alert.remove(),3000);
+      
+      setTimeout(() => alert.remove(), 3000);
     }
-    function showWarning(message){
+
+    function showWarning(message) {
+      debugLog(`Warning: ${message}`, null, 'warning');
+      
       const alert = document.createElement('div');
       alert.className = 'alert alert-warning';
       alert.innerHTML = `<span>⚠️</span><span>${escapeHtml(message)}</span>`;
+      
       const extractedSection = document.getElementById('extractedSection');
-      if (!extractedSection.classList.contains('hidden')) extractedSection.prepend(alert);
+      if (!extractedSection.classList.contains('hidden')) {
+        extractedSection.prepend(alert);
+      } else {
+        alert.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:300px;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+      }
     }
 
-    // ===== GLOBAL FAIL-SAFE =====
-    window.addEventListener('unhandledrejection', (e) => {
-      debugLog('❗Unhandled rejection: ' + (e.reason?.message || e.reason));
-      isProcessing = false; abortProcessing = false;
-      try { document.getElementById('progressSection').classList.add('hidden'); } catch {}
-      updateProcessButton();
+    // ===== GLOBAL ERROR HANDLERS =====
+    window.addEventListener('error', (e) => {
+      debugLog(`❗ Uncaught error: ${e.message}`, {
+        filename: e.filename,
+        lineno: e.lineno,
+        colno: e.colno,
+        error: e.error
+      }, 'error');
+      
+      if (isProcessing) {
+        isProcessing = false;
+        abortProcessing = false;
+        updateProcessButton();
+        showError(`An unexpected error occurred: ${e.message}`);
+      }
     });
 
-    // ===== EVENTS =====
+    window.addEventListener('unhandledrejection', (e) => {
+      debugLog(`❗ Unhandled promise rejection: ${e.reason?.message || e.reason}`, {
+        reason: e.reason,
+        promise: e.promise
+      }, 'error');
+      
+      if (isProcessing) {
+        isProcessing = false;
+        abortProcessing = false;
+        updateProcessButton();
+        try { 
+          document.getElementById('progressSection').classList.add('hidden'); 
+        } catch {}
+      }
+    });
+
+    // ===== EVENT LISTENERS =====
     document.addEventListener('DOMContentLoaded', () => {
+      debugLog('🎬 Application initialized');
+
+      // File input
       document.getElementById('imageInput').addEventListener('change', (e) => {
-        const newImages = Array.from(e.target.files).filter(f => f.type.startsWith('image/') && f.size <= 10485760);
-        if (newImages.length < e.target.files.length) showWarning('Some images were skipped (not image files or > 10MB)');
+        const files = Array.from(e.target.files);
+        debugLog(`File input changed: ${files.length} files selected`);
+        
+        const newImages = files.filter(f => {
+          if (!f.type.startsWith('image/')) {
+            debugLog(`Rejected ${f.name}: not an image`, null, 'warning');
+            return false;
+          }
+          if (f.size > 10485760) {
+            debugLog(`Rejected ${f.name}: too large (${formatFileSize(f.size)})`, null, 'warning');
+            return false;
+          }
+          return true;
+        });
+
+        if (newImages.length < files.length) {
+          showWarning(`Some files were skipped (must be images under 10MB)`);
+        }
+
         images = newImages;
+        debugLog(`Accepted ${images.length} images`);
+        
         updateImageList();
         updateProcessButton();
       });
-      document.getElementById('processBtn').addEventListener('click', processImages);
-      document.getElementById('cancelBtn').addEventListener('click', async () => {
-        abortProcessing = true;
-        showWarning('Cancelling…');
-        try { await releaseOcrWorker(); } catch {}
+
+      // Process button
+      document.getElementById('processBtn').addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent any default behavior
+        debugLog('Process button clicked');
+        processImages().catch(err => {
+          debugLog('Error in processImages', err, 'error');
+          showError(`Processing error: ${err.message}`);
+        });
       });
-      document.getElementById('enablePreprocessing').addEventListener('change', () => updateImageList());
-      document.getElementById('enableDebug').addEventListener('change', (e) => { debugMode = e.target.checked; });
+
+      // Cancel button
+      document.getElementById('cancelBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        debugLog('Cancel button clicked');
+        abortProcessing = true;
+        showWarning('Cancelling processing...');
+        
+        try {
+          await releaseOcrWorker();
+        } catch (err) {
+          debugLog('Error releasing worker during cancel', err, 'warning');
+        }
+      });
+
+      // Debug toggle
+      document.getElementById('enableDebug').addEventListener('change', (e) => {
+        debugMode = e.target.checked;
+        debugLog(`Debug mode ${debugMode ? 'enabled' : 'disabled'}`);
+        
+        if (!debugMode) {
+          document.getElementById('debugPanel').classList.add('hidden');
+        }
+      });
+
       updateProcessButton();
+      debugLog('✅ Event listeners attached');
     });
   </script>
 </body>
